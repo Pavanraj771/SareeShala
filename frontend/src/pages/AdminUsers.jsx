@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { ShieldAlert, Trash2, CheckCircle, XCircle, Eye } from 'lucide-react';
 import './AdminUsers.css'; // Let's also create this if needed, or put inline. We will use inline styles.
+import { API_URL } from '../config';
 
 const AdminUsers = () => {
   const { user } = useAuth();
@@ -23,7 +24,7 @@ const AdminUsers = () => {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:8000/api/users/admin/users/', {
+      const response = await fetch(`${API_URL}/api/users/admin/users/`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -44,7 +45,7 @@ const AdminUsers = () => {
 
   const handleToggleBlock = async (userId) => {
     try {
-      const response = await fetch(`http://localhost:8000/api/users/admin/users/${userId}/toggle-block/`, {
+      const response = await fetch(`${API_URL}/api/users/admin/users/${userId}/toggle-block/`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -72,7 +73,7 @@ const AdminUsers = () => {
     setUserDetails(null);
     setActiveDetailTab('summary');
     try {
-      const response = await fetch(`http://localhost:8000/api/users/admin/users/${userId}/details/`, {
+      const response = await fetch(`${API_URL}/api/users/admin/users/${userId}/details/`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -93,7 +94,7 @@ const AdminUsers = () => {
     if (!userId) return;
     
     try {
-      const response = await fetch(`http://localhost:8000/api/users/admin/users/${userId}/`, {
+      const response = await fetch(`${API_URL}/api/users/admin/users/${userId}/`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`

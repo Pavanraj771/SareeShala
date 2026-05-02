@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Package, ArrowLeft, Clock } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import './StubPage.css';
+import { API_URL } from '../config';
 
 const Orders = () => {
   const { user } = useAuth();
@@ -12,7 +13,7 @@ const Orders = () => {
 
   useEffect(() => {
     if (user && user.token) {
-      fetch('http://localhost:8000/api/orders/my-orders/', {
+      fetch(`${API_URL}/api/orders/my-orders/`, {
         headers: { 'Authorization': `Bearer ${user.token}` }
       })
       .then(res => res.json())

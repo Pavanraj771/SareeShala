@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ShoppingBag, ArrowLeft, Trash2, Plus, Minus } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import './StubPage.css';
+import { API_URL } from '../config';
 
 const Cart = () => {
   const navigate = useNavigate();
@@ -17,7 +18,7 @@ const Cart = () => {
       return;
     }
     try {
-      const res = await fetch('http://localhost:8000/api/orders/cart/', {
+      const res = await fetch(`${API_URL}/api/orders/cart/`, {
         headers: { 'Authorization': `Bearer ${user.token}` }
       });
       const data = await res.json();
@@ -58,7 +59,7 @@ const Cart = () => {
     }
 
     try {
-      await fetch('http://localhost:8000/api/orders/cart/', {
+      await fetch(`${API_URL}/api/orders/cart/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -74,7 +75,7 @@ const Cart = () => {
 
   const remove = async (id) => {
     try {
-      await fetch('http://localhost:8000/api/orders/cart/', {
+      await fetch(`${API_URL}/api/orders/cart/`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',

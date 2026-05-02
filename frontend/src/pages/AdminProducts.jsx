@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Edit2, Trash2, Plus, X } from 'lucide-react';
+import { API_URL } from '../config';
 
 const AdminProducts = () => {
   const [products, setProducts] = useState([]);
@@ -22,7 +23,7 @@ const AdminProducts = () => {
 
   const fetchProducts = async () => {
     try {
-      const res = await axios.get('http://localhost:8000/api/products/');
+      const res = await axios.get(`${API_URL}/api/products/`);
       setProducts(res.data);
     } catch (err) {
       console.error(err);
@@ -80,9 +81,9 @@ const AdminProducts = () => {
 
     try {
       if (editId) {
-        await axios.put(`http://localhost:8000/api/products/${editId}/`, data, { headers: { 'Content-Type': 'multipart/form-data' }});
+        await axios.put(`${API_URL}/api/products/${editId}/`, data, { headers: { 'Content-Type': 'multipart/form-data' }});
       } else {
-        await axios.post('http://localhost:8000/api/products/', data, { headers: { 'Content-Type': 'multipart/form-data' }});
+        await axios.post(`${API_URL}/api/products/`, data, { headers: { 'Content-Type': 'multipart/form-data' }});
       }
       setShowModal(false);
       fetchProducts();
@@ -94,7 +95,7 @@ const AdminProducts = () => {
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this product?')) return;
     try {
-      await axios.delete(`http://localhost:8000/api/products/${id}/`);
+      await axios.delete(`${API_URL}/api/products/${id}/`);
       fetchProducts();
     } catch (err) {
       console.error('Error deleting product', err);

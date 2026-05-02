@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Heart, ArrowLeft, ShoppingBag, Trash2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import './StubPage.css';
+import { API_URL } from '../config';
 
 const initialWishlist = [
   { id: 1, name: 'Purple Georgette Saree',  price: '₹3,200', tag: 'Party Wear'  },
@@ -19,7 +20,7 @@ const Wishlist = () => {
 
   useEffect(() => {
     if (user && user.token) {
-      fetch('http://localhost:8000/api/users/wishlist/', {
+      fetch(`${API_URL}/api/users/wishlist/`, {
         headers: { 'Authorization': `Bearer ${user.token}` }
       })
       .then(res => res.json())
@@ -40,7 +41,7 @@ const Wishlist = () => {
 
   const remove = async (id) => {
     try {
-      await fetch('http://localhost:8000/api/users/wishlist/', {
+      await fetch(`${API_URL}/api/users/wishlist/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -56,7 +57,7 @@ const Wishlist = () => {
 
   const addToCart = async (id) => {
     try {
-      const res = await fetch('http://localhost:8000/api/orders/cart/', {
+      const res = await fetch(`${API_URL}/api/orders/cart/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

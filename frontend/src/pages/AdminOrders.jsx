@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Search } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import './AdminOrders.css';
+import { API_URL } from '../config';
 
 const AdminOrders = () => {
   const { user } = useAuth();
@@ -12,7 +13,7 @@ const AdminOrders = () => {
 
   const fetchOrders = async () => {
     try {
-      const res = await fetch('http://localhost:8000/api/orders/admin/orders/', {
+      const res = await fetch(`${API_URL}/api/orders/admin/orders/`, {
         headers: { 'Authorization': `Bearer ${user.token}` }
       });
       const data = await res.json();
@@ -37,7 +38,7 @@ const AdminOrders = () => {
     }
     
     try {
-      const res = await fetch(`http://localhost:8000/api/orders/admin/orders/${orderId}/status/`, {
+      const res = await fetch(`${API_URL}/api/orders/admin/orders/${orderId}/status/`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',

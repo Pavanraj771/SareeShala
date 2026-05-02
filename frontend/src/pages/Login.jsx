@@ -4,6 +4,7 @@ import { Eye, EyeOff, LogIn, ArrowLeft, Loader2 } from 'lucide-react';
 import { useGoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../context/AuthContext';
 import './Auth.css';
+import { API_URL } from '../config';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -20,7 +21,7 @@ const Login = () => {
         setLoading(true);
         setError('');
         
-        const res = await fetch('http://localhost:8000/api/users/google/', {
+        const res = await fetch(`${API_URL}/api/users/google/`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ token: tokenResponse.access_token }),
@@ -81,7 +82,7 @@ const Login = () => {
 
     try {
       // ── API call to Django backend ──
-      const res = await fetch('http://localhost:8000/api/users/login/', {
+      const res = await fetch(`${API_URL}/api/users/login/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username: form.username, password: form.password }),

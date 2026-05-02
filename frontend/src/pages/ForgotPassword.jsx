@@ -4,6 +4,7 @@ import {
   Mail, ShieldCheck, ArrowLeft, Loader2, Eye, EyeOff, Check, KeyRound
 } from 'lucide-react';
 import './Auth.css';
+import { API_URL } from '../config';
 
 /* ── OTP countdown hook ── */
 const useCountdown = (initial = 60) => {
@@ -49,7 +50,7 @@ const ForgotPassword = () => {
     setError('');
 
     try {
-      const res = await fetch('http://localhost:8000/api/users/send-otp/', {
+      const res = await fetch(`${API_URL}/api/users/send-otp/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: email.trim().toLowerCase(), purpose: 'password_reset' }),
@@ -89,7 +90,7 @@ const ForgotPassword = () => {
     setError('');
 
     try {
-      const res = await fetch('http://localhost:8000/api/users/reset-password/', {
+      const res = await fetch(`${API_URL}/api/users/reset-password/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

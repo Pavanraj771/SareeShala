@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { CreditCard, Truck, ShieldCheck, ArrowLeft, Loader2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import './StubPage.css';
+import { API_URL } from '../config';
 
 const Checkout = () => {
   const navigate = useNavigate();
@@ -28,7 +29,7 @@ const Checkout = () => {
     }
     const fetchCart = async () => {
       try {
-        const res = await fetch('http://localhost:8000/api/orders/cart/', {
+        const res = await fetch(`${API_URL}/api/orders/cart/`, {
           headers: { 'Authorization': `Bearer ${user.token}` }
         });
         const data = await res.json();
@@ -62,7 +63,7 @@ const Checkout = () => {
     // Simulate payment gateway delay
     setTimeout(async () => {
       try {
-        const res = await fetch('http://localhost:8000/api/orders/checkout/', {
+        const res = await fetch(`${API_URL}/api/orders/checkout/`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

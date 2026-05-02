@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import ProfileDropdown from '../components/ProfileDropdown';
 import { useAuth } from '../context/AuthContext';
 import './Home.css';
+import { API_URL } from '../config';
 
 const Home = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -23,7 +24,7 @@ const Home = () => {
     
     const fetchProducts = async () => {
       try {
-        const res = await fetch('http://localhost:8000/api/products/');
+        const res = await fetch(`${API_URL}/api/products/`);
         const data = await res.json();
         setProducts(data);
       } catch (err) {
@@ -35,7 +36,7 @@ const Home = () => {
     
     if (user && user.token) {
       // Fetch Cart Count
-      fetch('http://localhost:8000/api/orders/cart/', {
+      fetch(`${API_URL}/api/orders/cart/`, {
         headers: { 'Authorization': `Bearer ${user.token}` }
       })
       .then(res => res.json())
@@ -50,7 +51,7 @@ const Home = () => {
       .catch(console.error);
 
       // Fetch Orders to derive Notification Count
-      fetch('http://localhost:8000/api/orders/my-orders/', {
+      fetch(`${API_URL}/api/orders/my-orders/`, {
         headers: { 'Authorization': `Bearer ${user.token}` }
       })
       .then(res => res.json())
@@ -68,7 +69,7 @@ const Home = () => {
 
   useEffect(() => {
     if (user && user.token) {
-      fetch('http://localhost:8000/api/users/wishlist/', {
+      fetch(`${API_URL}/api/users/wishlist/`, {
         headers: { 'Authorization': `Bearer ${user.token}` }
       })
       .then(res => res.json())
@@ -92,7 +93,7 @@ const Home = () => {
     }
     
     try {
-      const res = await fetch('http://localhost:8000/api/users/wishlist/', {
+      const res = await fetch(`${API_URL}/api/users/wishlist/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

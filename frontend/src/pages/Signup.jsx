@@ -7,6 +7,7 @@ import {
 import { useGoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../context/AuthContext';
 import './Auth.css';
+import { API_URL } from '../config';
 
 /* ── Password strength helper ── */
 const passwordStrength = (pwd) => {
@@ -74,7 +75,7 @@ const Signup = () => {
         setLoading(true);
         setError('');
         
-        const res = await fetch('http://localhost:8000/api/users/google/', {
+        const res = await fetch(`${API_URL}/api/users/google/`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ token: tokenResponse.access_token }),
@@ -130,7 +131,7 @@ const Signup = () => {
     setOtpError('');
 
     try {
-      const res = await fetch('http://localhost:8000/api/users/send-otp/', {
+      const res = await fetch(`${API_URL}/api/users/send-otp/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: form.email, purpose: 'registration' }),
@@ -175,7 +176,7 @@ const Signup = () => {
     setOtpError('');
 
     try {
-      const res = await fetch('http://localhost:8000/api/users/register/', {
+      const res = await fetch(`${API_URL}/api/users/register/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

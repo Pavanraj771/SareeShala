@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Bell, ArrowLeft, Package, Star, Tag } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import './StubPage.css';
+import { API_URL } from '../config';
 
 const Notifications = () => {
   const navigate = useNavigate();
@@ -19,7 +20,7 @@ const Notifications = () => {
 
     const fetchOrders = async () => {
       try {
-        const res = await fetch('http://localhost:8000/api/orders/my-orders/', {
+        const res = await fetch(`${API_URL}/api/orders/my-orders/`, {
           headers: { 'Authorization': `Bearer ${user.token}` }
         });
         if (res.ok) {

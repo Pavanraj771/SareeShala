@@ -4,6 +4,7 @@ import axios from 'axios';
 import { ArrowLeft, ShoppingBag, Heart } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import './ProductDetails.css';
+import { API_URL } from '../config';
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -21,7 +22,7 @@ const ProductDetails = () => {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const res = await axios.get(`http://localhost:8000/api/products/${id}/`);
+        const res = await axios.get(`${API_URL}/api/products/${id}/`);
         setProduct(res.data);
         setMainImage(res.data.image1 || 'https://via.placeholder.com/400');
         setLoading(false);
@@ -35,7 +36,7 @@ const ProductDetails = () => {
 
   useEffect(() => {
     if (user && user.token) {
-      fetch('http://localhost:8000/api/users/wishlist/', {
+      fetch(`${API_URL}/api/users/wishlist/`, {
         headers: { 'Authorization': `Bearer ${user.token}` }
       })
       .then(res => res.json())
@@ -58,7 +59,7 @@ const ProductDetails = () => {
     }
     
     try {
-      const res = await fetch('http://localhost:8000/api/users/wishlist/', {
+      const res = await fetch(`${API_URL}/api/users/wishlist/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -82,7 +83,7 @@ const ProductDetails = () => {
     }
     
     try {
-      const res = await fetch('http://localhost:8000/api/orders/cart/', {
+      const res = await fetch(`${API_URL}/api/orders/cart/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
