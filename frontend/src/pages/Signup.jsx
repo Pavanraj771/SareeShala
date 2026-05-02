@@ -42,7 +42,7 @@ const useCountdown = (initial = 60) => {
 
 const Signup = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, showMessage } = useAuth();
 
   /* ── Form state ── */
   const [form, setForm] = useState({
@@ -91,6 +91,7 @@ const Signup = () => {
           token: data.token,
         });
 
+        if (showMessage) showMessage('Welcome to SareeShala! ✨');
         navigate('/');
       } catch (err) {
         setError(err.message || 'Google login failed');
@@ -200,6 +201,7 @@ const Signup = () => {
         token:     data.token,
       });
 
+      if (showMessage) showMessage('Welcome to SareeShala! ✨');
       setTimeout(() => navigate('/'), 600);
     } catch (err) {
       const msg = err.message || '';

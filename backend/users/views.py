@@ -24,6 +24,22 @@ def get_tokens(user):
     }
 
 
+def send_welcome_email(user):
+    from django.core.mail import send_mail
+    try:
+        subject = 'Welcome to SareeShala! ✨'
+        message = f"Hi {user.first_name or user.username},\n\nThank you for joining SareeShala! We are thrilled to have you.\n\nEnjoy an exclusive 10% off on your first purchase.\n\nHappy Shopping,\nThe SareeShala Team"
+        send_mail(
+            subject,
+            message,
+            'sareeshala@outlook.com',
+            [user.email],
+            fail_silently=True,
+        )
+    except Exception as e:
+        print(f"Failed to send welcome email: {e}")
+
+
 def _send_otp_email(email, otp_code, purpose):
     """Send the OTP code to the user's email address."""
     if purpose == OTPVerification.PURPOSE_REGISTRATION:
@@ -181,6 +197,8 @@ def register(request):
         phone_number=data.get('phone_number', ''),
     )
 
+    send_welcome_email(user)
+
     tokens = get_tokens(user)
     return Response({
         'username':   user.username,
@@ -290,6 +308,7 @@ def google_login(request):
                 first_name=first_name,
                 last_name=last_name,
             )
+            send_welcome_email(user)
             
         tokens = get_tokens(user)
         return Response({

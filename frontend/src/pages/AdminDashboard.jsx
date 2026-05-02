@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import AdminProducts from './AdminProducts';
 import AdminUsers from './AdminUsers';
+import AdminOrders from './AdminOrders';
 
 const AdminDashboard = () => {
   const { user, logout } = useAuth();
@@ -57,7 +58,7 @@ const AdminDashboard = () => {
             <p style={{ color: '#aaa', margin: 0, fontSize: '0.9rem', lineHeight: '1.5' }}>
               View and update customer order statuses. Process shipments and returns.
             </p>
-            <button style={{ marginTop: '15px', background: 'rgba(255,255,255,0.1)', border: 'none', padding: '8px 12px', color: '#fff', borderRadius: '6px', cursor: 'pointer' }}>View Orders</button>
+            <button onClick={() => setActiveTab('orders')} style={{ marginTop: '15px', background: 'rgba(255,255,255,0.1)', border: 'none', padding: '8px 12px', color: '#fff', borderRadius: '6px', cursor: 'pointer' }}>View Orders</button>
           </div>
           <div style={{ background: '#1e1e1e', padding: '1.5rem', borderRadius: '12px', border: '1px solid #333' }}>
             <h3 style={{ margin: '0 0 10px 0', color: '#d4af37' }}>👥 User Management</h3>
@@ -70,6 +71,7 @@ const AdminDashboard = () => {
       )}
 
       {activeTab === 'products' && <AdminProducts />}
+      {activeTab === 'orders' && <AdminOrders />}
       {activeTab === 'users' && <AdminUsers />}
     </div>
   );

@@ -10,6 +10,9 @@ const Home = () => {
   const [products, setProducts] = useState([]);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [wishlist, setWishlist] = useState(new Set());
+  const [cartCount, setCartCount] = useState(0);
+  const [unseenCartCount, setUnseenCartCount] = useState(0);
+  const [unseenNotifCount, setUnseenNotifCount] = useState(0);
   
   const navigate = useNavigate();
   const { user, showMessage } = useAuth();
@@ -24,13 +27,44 @@ const Home = () => {
         const data = await res.json();
         setProducts(data);
       } catch (err) {
-        console.error('Failed to fetch products', err);
+        console.error(err);
       }
     };
+    
     fetchProducts();
     
+    if (user && user.token) {
+      // Fetch Cart Count
+      fetch('http://localhost:8000/api/orders/cart/', {
+        headers: { 'Authorization': `Bearer ${user.token}` }
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.items) {
+          const count = data.items.reduce((sum, item) => sum + item.quantity, 0);
+          setCartCount(count);
+          const seenCount = parseInt(localStorage.getItem('seenCartCount') || '0', 10);
+          setUnseenCartCount(Math.max(0, count - seenCount));
+        }
+      })
+      .catch(console.error);
+
+      // Fetch Orders to derive Notification Count
+      fetch('http://localhost:8000/api/orders/my-orders/', {
+        headers: { 'Authorization': `Bearer ${user.token}` }
+      })
+      .then(res => res.json())
+      .then(orders => {
+        const totalNotifs = 2 + (orders.length || 0); // 2 static (welcome + promo)
+        const seenCount = parseInt(localStorage.getItem('seenNotifCount') || '0', 10);
+        const unseen = Math.max(0, totalNotifs - seenCount);
+        setUnseenNotifCount(unseen);
+      })
+      .catch(console.error);
+    }
+    
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     if (user && user.token) {
@@ -90,7 +124,14 @@ const Home = () => {
         <div className={`nav-links ${mobileMenuOpen ? 'mobile-open' : ''}`}>
           <a href="#new" className="nav-item" onClick={() => setMobileMenuOpen(false)}>New Arrivals</a>
           <a href="#collections" className="nav-item" onClick={() => setMobileMenuOpen(false)}>Collections</a>
-          <a href="#bridal" className="nav-item" onClick={() => setMobileMenuOpen(false)}>Bridal</a>
+          <span className="nav-item" onClick={() => { setMobileMenuOpen(false); navigate('/notifications'); }} style={{cursor: 'pointer', position: 'relative'}}>
+            Notifications
+            {unseenNotifCount > 0 && (
+              <span className="nav-badge" style={{ position: 'absolute', top: '-8px', right: '-12px', background: '#e74c3c', color: 'white', fontSize: '0.65rem', fontWeight: 'bold', padding: '2px 6px', borderRadius: '10px' }}>
+                {unseenNotifCount}
+              </span>
+            )}
+          </span>
           <a href="#about" className="nav-item" onClick={() => setMobileMenuOpen(false)}>Our Story</a>
         </div>
         
@@ -98,8 +139,13 @@ const Home = () => {
           <button id="search-btn" className="action-btn" aria-label="Search">
             <Search size={20} />
           </button>
-          <button id="cart-nav-btn" className="action-btn" aria-label="Cart" onClick={() => navigate('/cart')}>
+          <button id="cart-nav-btn" className="action-btn" style={{ position: 'relative' }} aria-label="Cart" onClick={() => navigate('/cart')}>
             <ShoppingBag size={20} />
+            {unseenCartCount > 0 && (
+              <span className="nav-badge" style={{ position: 'absolute', top: '0', right: '0', background: '#e74c3c', color: 'white', fontSize: '0.65rem', fontWeight: 'bold', padding: '2px 5px', borderRadius: '10px', transform: 'translate(25%, -25%)' }}>
+                {unseenCartCount}
+              </span>
+            )}
           </button>
           <ProfileDropdown />
           <button className="action-btn mobile-toggle" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>

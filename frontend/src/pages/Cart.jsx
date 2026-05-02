@@ -23,11 +23,19 @@ const Cart = () => {
       const data = await res.json();
       setItems(data.items || []);
       setCartTotal(parseFloat(data.cart_total) || 0);
+      if (data.items) {
+        const total = data.items.reduce((sum, item) => sum + item.quantity, 0);
+        localStorage.setItem('seenCartCount', total.toString());
+      }
       setLoading(false);
     } catch (err) {
       console.error(err);
       setLoading(false);
     }
+  };
+
+  const handleCheckout = () => {
+    navigate('/checkout');
   };
 
   useEffect(() => {
@@ -145,7 +153,7 @@ const Cart = () => {
               <div className="summary-row"><span>Delivery</span><span>₹{delivery}</span></div>
               <div className="summary-divider"/>
               <div className="summary-row summary-total"><span>Total</span><span>₹{total.toLocaleString()}</span></div>
-              <button id="checkout-btn" className="auth-submit" style={{marginTop:'1rem'}} onClick={() => { if (showMessage) showMessage('Checkout coming soon!'); }}>
+              <button id="checkout-btn" className="auth-submit" style={{marginTop:'1rem'}} onClick={handleCheckout}>
                 Proceed to Checkout
               </button>
               <button className="demo-btn" style={{marginTop:'0.5rem'}} onClick={() => navigate('/')}>

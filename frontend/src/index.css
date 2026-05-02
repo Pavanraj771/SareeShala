@@ -50,6 +50,13 @@ a {
   color: inherit;
 }
 
+/* App Wrapper to push footer to bottom */
+.app-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
 /* Utils */
 .glass-panel {
   background: var(--color-bg-glass);

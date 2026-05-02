@@ -1,0 +1,94 @@
+.admin-content {
+  background: #1e1e1e;
+  padding: 2rem;
+  border-radius: 12px;
+  color: #fff;
+  font-family: var(--font-sans);
+}
+
+.admin-header {
+  margin-bottom: 1.5rem;
+}
+
+.admin-title {
+  color: #d4af37;
+  font-family: var(--font-serif);
+  margin: 0;
+  font-size: 1.8rem;
+}
+
+.admin-subtitle {
+  color: #aaa;
+  margin: 5px 0 0 0;
+  font-size: 0.95rem;
+}
+
+.admin-toolbar {
+  display: flex;
+  margin-bottom: 1.5rem;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  background: #121212;
+  border: 1px solid #333;
+  border-radius: 6px;
+  padding: 8px 12px;
+  width: 100%;
+  max-width: 400px;
+}
+
+.search-box .search-icon {
+  color: #888;
+  margin-right: 8px;
+}
+
+.search-box input {
+  background: transparent;
+  border: none;
+  color: #fff;
+  width: 100%;
+  outline: none;
+}
+
+.search-box input::placeholder {
+  color: #888;
+}
+
+.admin-table-container {
+  overflow-x: auto;
+  border-radius: 8px;
+  background: #1e1e1e;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.admin-table th {
+  padding: 1rem;
+  color: #aaa;
+  font-weight: normal;
+  border-bottom: 1px solid #333;
+}
+
+.admin-table td {
+  padding: 1rem;
+  border-bottom: 1px solid #2a2a2a;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: bold;
+}
+
+.status-badge {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}

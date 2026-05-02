@@ -119,6 +119,9 @@ const ProfileDropdown = () => {
 
             <div className="dropdown-divider" />
 
+            <button className="dropdown-item" onClick={() => go('/orders')}>
+              <Package size={16} /> Track Order
+            </button>
             <button className="dropdown-item" onClick={() => go('/wishlist')}>
               <Heart size={16} /> Wishlist
             </button>

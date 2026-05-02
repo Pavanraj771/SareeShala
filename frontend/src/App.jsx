@@ -13,12 +13,17 @@ import Reviews         from './pages/Reviews'
 import AccountSettings from './pages/AccountSettings'
 import AdminDashboard  from './pages/AdminDashboard'
 import ProductDetails  from './pages/ProductDetails'
+import FAQ             from './pages/FAQ'
+import Checkout        from './pages/Checkout'
+import Notifications   from './pages/Notifications'
+import Footer          from './components/Footer'
 
 function App() {
   return (
     <AuthProvider>
       <Router>
-        <Routes>
+        <div className="app-wrapper">
+          <Routes>
           <Route path="/"                element={<Home />} />
           <Route path="/login"           element={<Login />} />
           <Route path="/signup"          element={<Signup />} />
@@ -31,7 +36,12 @@ function App() {
           <Route path="/settings"        element={<AccountSettings />} />
           <Route path="/admin"           element={<AdminDashboard />} />
           <Route path="/product/:id"     element={<ProductDetails />} />
-        </Routes>
+          <Route path="/faq"             element={<FAQ />} />
+          <Route path="/checkout"        element={<Checkout />} />
+          <Route path="/notifications"   element={<Notifications />} />
+          </Routes>
+          <Footer />
+        </div>
       </Router>
     </AuthProvider>
   )
