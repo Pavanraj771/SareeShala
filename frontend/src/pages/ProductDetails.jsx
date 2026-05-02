@@ -1,0 +1,175 @@
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { ArrowLeft, ShoppingBag, Heart } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import './ProductDetails.css';
+
+const ProductDetails = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { user, showMessage } = useAuth();
+  
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [mainImage, setMainImage] = useState('');
+  const [error, setError] = useState('');
+  const [isLiked, setIsLiked] = useState(false);
+
+  const isAdmin = user?.is_staff || user?.token === 'admin_token_123';
+
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const res = await axios.get(`http://localhost:8000/api/products/${id}/`);
+        setProduct(res.data);
+        setMainImage(res.data.image1 || 'https://via.placeholder.com/400');
+        setLoading(false);
+      } catch (err) {
+        setError('Failed to fetch product details.');
+        setLoading(false);
+      }
+    };
+    fetchProduct();
+  }, [id]);
+
+  useEffect(() => {
+    if (user && user.token) {
+      fetch('http://localhost:8000/api/users/wishlist/', {
+        headers: { 'Authorization': `Bearer ${user.token}` }
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          // Check if this specific product id is in the wishlist
+          const found = data.some(item => item.id === parseInt(id));
+          setIsLiked(found);
+        }
+      })
+      .catch(console.error);
+    }
+  }, [user, id]);
+
+  const toggleWishlist = async (e) => {
+    e.preventDefault();
+    if (!user) {
+      if (showMessage) showMessage('Please log in to add items to your wishlist.');
+      return;
+    }
+    
+    try {
+      const res = await fetch('http://localhost:8000/api/users/wishlist/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${user.token}`
+        },
+        body: JSON.stringify({ product_id: id })
+      });
+      const data = await res.json();
+      setIsLiked(data.liked);
+      if (showMessage) showMessage(data.message);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const addToCart = async (e) => {
+    e.preventDefault();
+    if (!user) {
+      if (showMessage) showMessage('Please log in to add items to your cart.');
+      return;
+    }
+    
+    try {
+      const res = await fetch('http://localhost:8000/api/orders/cart/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${user.token}`
+        },
+        body: JSON.stringify({ product_id: id, quantity: 1 })
+      });
+      const data = await res.json();
+      if (showMessage) showMessage(data.message);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  if (loading) return <div className="loading-state">Loading product details...</div>;
+  if (error) return <div className="error-state">{error}</div>;
+  if (!product) return null;
+
+  const images = [product.image1, product.image2, product.image3, product.image4, product.image5].filter(Boolean);
+
+  return (
+    <div className="product-details-container animate-fade-in">
+      <button className="back-btn" onClick={() => navigate(-1)}>
+        <ArrowLeft size={20} /> Back
+      </button>
+
+      <div className="product-content">
+        <div className="product-gallery">
+          <div className="main-image-container">
+            <img src={mainImage} alt={product.name} className="main-image" />
+          </div>
+          {images.length > 1 && (
+            <div className="thumbnail-list">
+              {images.map((img, idx) => (
+                <img 
+                  key={idx} 
+                  src={img} 
+                  alt={`${product.name} ${idx + 1}`} 
+                  className={`thumbnail ${mainImage === img ? 'active' : ''}`}
+                  onClick={() => setMainImage(img)}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="product-info">
+          <h1 className="product-title text-gradient">{product.name}</h1>
+          <p className="product-price">₹{product.price}</p>
+          
+          <div className="product-stock">
+            {product.stock > 0 ? (
+              <span className="in-stock">In Stock ({product.stock} available)</span>
+            ) : (
+              <span className="out-of-stock">Out of Stock</span>
+            )}
+          </div>
+
+          <div className="product-description">
+            <h3>Description</h3>
+            <p style={{ whiteSpace: 'pre-wrap' }}>{product.description}</p>
+          </div>
+          
+          {!isAdmin && (
+            <div className="product-actions" style={{ display: 'flex', gap: '15px', marginTop: '1rem', alignItems: 'center' }}>
+              <button 
+                className={`details-like-btn ${isLiked ? 'liked' : ''}`}
+                onClick={toggleWishlist}
+                aria-label="Toggle Wishlist"
+              >
+                <Heart size={24} fill={isLiked ? "currentColor" : "none"} />
+              </button>
+
+              <button 
+                className="btn-primary add-to-cart-btn" 
+                disabled={product.stock <= 0} 
+                style={{ margin: 0, flex: 1 }}
+                onClick={addToCart}
+              >
+                <ShoppingBag size={20} /> Add to Cart
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ProductDetails;

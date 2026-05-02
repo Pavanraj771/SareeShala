@@ -1,0 +1,232 @@
+/* ──────────────────────────────────────────────
+   Profile Dropdown — SareeShala
+────────────────────────────────────────────── */
+
+.profile-dropdown-wrapper {
+  position: relative;
+}
+
+/* ── Trigger Button ── */
+.profile-trigger {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 6px 12px 6px 6px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50px;
+  cursor: pointer;
+  color: var(--color-text-primary);
+  transition: var(--transition-smooth);
+  font-family: var(--font-sans);
+}
+
+.profile-trigger:hover,
+.profile-trigger.active {
+  background: rgba(212, 175, 55, 0.15);
+  border-color: var(--color-accent-primary);
+  color: var(--color-accent-primary);
+}
+
+.profile-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--color-accent-gradient);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #000;
+  font-weight: 700;
+  font-size: 0.8rem;
+  flex-shrink: 0;
+}
+
+.avatar-initials {
+  font-family: var(--font-sans);
+  font-weight: 700;
+}
+
+.profile-name-label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  max-width: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chevron {
+  transition: transform 0.3s ease;
+  opacity: 0.7;
+}
+
+.chevron.rotated {
+  transform: rotate(180deg);
+}
+
+/* ── Dropdown Menu ── */
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  width: 280px;
+  background: rgba(16, 16, 20, 0.96);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--border-radius-md);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(212, 175, 55, 0.08);
+  overflow: hidden;
+  z-index: 999;
+
+  /* closed state */
+  opacity: 0;
+  transform: translateY(-10px) scale(0.97);
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dropdown-menu.dropdown-open {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: all;
+}
+
+/* ── Header Block ── */
+.dropdown-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 18px 16px;
+}
+
+.dropdown-avatar-lg {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: var(--color-accent-gradient);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #000;
+  flex-shrink: 0;
+}
+
+.dropdown-user-info {
+  min-width: 0;
+}
+
+.dropdown-username {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dropdown-email {
+  font-size: 0.78rem;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Guest header */
+.guest-header {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.guest-greeting {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--color-text-primary);
+}
+
+.guest-sub {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+  line-height: 1.4;
+}
+
+/* ── Divider ── */
+.dropdown-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.07);
+  margin: 4px 0;
+}
+
+/* ── Menu Items ── */
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 11px 18px;
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  font-family: var(--font-sans);
+  font-size: 0.88rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.dropdown-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--color-text-primary);
+}
+
+.dropdown-item svg {
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+.dropdown-item:hover svg {
+  opacity: 1;
+}
+
+/* Auth buttons (for guest) */
+.auth-btn {
+  margin: 4px 12px;
+  width: calc(100% - 24px);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-weight: 600 !important;
+}
+
+.login-btn {
+  background: var(--color-accent-gradient) !important;
+  color: #000 !important;
+}
+
+.login-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.signup-btn {
+  border: 1px solid rgba(212, 175, 55, 0.4) !important;
+  color: var(--color-accent-primary) !important;
+}
+
+.signup-btn:hover {
+  background: rgba(212, 175, 55, 0.1) !important;
+}
+
+/* Logout item */
+.logout-item {
+  color: #ff6b6b !important;
+}
+
+.logout-item:hover {
+  background: rgba(255, 107, 107, 0.08) !important;
+}
