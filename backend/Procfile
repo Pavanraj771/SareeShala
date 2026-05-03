@@ -1,0 +1,2 @@
+web: gunicorn SareeShala.wsgi:application
+worker: celery -A SareeShala worker --loglevel=info
