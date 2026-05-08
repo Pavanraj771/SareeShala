@@ -1,13 +1,13 @@
+databases:
+  # PostgreSQL database
+  - name: sareeshala-db
+    plan: free
+
 services:
   # Redis service for caching and Celery broker
   - type: redis
     name: sareeshala-redis
     ipAllowList: [] # internal only
-    plan: free
-
-  # PostgreSQL database
-  - type: pgo
-    name: sareeshala-db
     plan: free
 
   # Django Web Service
