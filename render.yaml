@@ -39,6 +39,6 @@ services:
       - key: EMAIL_HOST_PASSWORD
         sync: false # User must provide this manually in the dashboard later
       - key: PYTHON_VERSION
-        value: 3.10.0
+        value: 3.13.2
 
 
