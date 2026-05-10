@@ -8,12 +8,12 @@ import { useAuth } from '../context/AuthContext';
 import './Profile.css';
 import { API_URL } from '../config';
 
-const statCards = [
-  { icon: <ShoppingBag size={20} />, label: 'Total Orders', value: '12', color: '#d4af37' },
-  { icon: <Heart size={20} />,       label: 'Wishlist',      value: '8',  color: '#c2185b' },
-  { icon: <Star size={20} />,        label: 'Reviews',       value: '5',  color: '#9b59b6' },
-  { icon: <Package size={20} />,     label: 'Delivered',     value: '10', color: '#27ae60' },
-];
+// const statCards = [
+//   { icon: <ShoppingBag size={20} />, label: 'Total Orders', value: '12', color: '#d4af37' },
+//   { icon: <Heart size={20} />,       label: 'Wishlist',      value: '8',  color: '#c2185b' },
+//   { icon: <Star size={20} />,        label: 'Reviews',       value: '5',  color: '#9b59b6' },
+//   { icon: <Package size={20} />,     label: 'Delivered',     value: '10', color: '#27ae60' },
+// ];
 
 const Profile = () => {
   const { user, logout, updateUser } = useAuth();
@@ -48,6 +48,7 @@ const Profile = () => {
             phone:     data.phone_number,
             address:   data.address,
             dateJoined: data.date_joined,
+            stats: data.stats,
           };
           updateUser(updatedUser);
           setForm({
@@ -135,6 +136,13 @@ const Profile = () => {
     setEditing(false);
   };
 
+  const statCardsData = [
+    { icon: <ShoppingBag size={20} />, label: 'Total Orders', value: user?.stats?.total_orders || '0', color: '#d4af37' },
+    { icon: <Heart size={20} />,       label: 'Wishlist',      value: user?.stats?.wishlist_count || '0',  color: '#c2185b' },
+    { icon: <Star size={20} />,        label: 'Reviews',       value: user?.stats?.review_count || '0',  color: '#9b59b6' },
+    { icon: <Package size={20} />,     label: 'Delivered',     value: user?.stats?.delivered_count || '0', color: '#27ae60' },
+  ];
+
   return (
     <div className="profile-page">
       {/* Background */}
@@ -190,7 +198,7 @@ const Profile = () => {
 
           {/* Stat Cards */}
           <div className="profile-stats">
-            {statCards.map((s) => (
+            {statCardsData.map((s) => (
               <div className="stat-card" key={s.label}>
                 <div className="stat-icon" style={{ color: s.color, background: `${s.color}18` }}>
                   {s.icon}

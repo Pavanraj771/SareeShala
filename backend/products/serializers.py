@@ -3,6 +3,7 @@ from .models import Product, Category, Review
 
 class ProductSerializer(serializers.ModelSerializer):
     color_variants = serializers.SerializerMethodField()
+    total_sales = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Product

@@ -11,7 +11,9 @@ from google.auth.transport import requests as google_requests
 from django.utils.crypto import get_random_string
 import traceback
 import requests
-from .models import CustomUser, OTPVerification
+from .models import CustomUser, OTPVerification, Wishlist
+from orders.models import Order
+from products.models import Review
 
 
 # ─────────────────────────────────────────────
@@ -387,6 +389,12 @@ def me(request):
         'phone_number': user.phone_number,
         'address':      user.address,
         'date_joined':  user.date_joined.strftime('%d %b %Y'),
+        'stats': {
+            'total_orders': Order.objects.filter(user=user).count(),
+            'wishlist_count': Wishlist.objects.filter(user=user).count(),
+            'review_count': Review.objects.filter(user=user).count(),
+            'delivered_count': Order.objects.filter(user=user, status='DELIVERED').count(),
+        }
     })
 
 

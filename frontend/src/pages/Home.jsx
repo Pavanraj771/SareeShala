@@ -135,6 +135,8 @@ const Home = () => {
     );
   });
 
+  const bestSellers = [...filteredProducts].sort((a, b) => (b.total_sales || 0) - (a.total_sales || 0));
+
   return (
     <div className="home-container">
       {/* Navigation */}
@@ -149,7 +151,7 @@ const Home = () => {
         
         <div className={`nav-links ${mobileMenuOpen ? 'mobile-open' : ''}`}>
           <a href="#new" className="nav-item" onClick={() => setMobileMenuOpen(false)}>New Arrivals</a>
-          <a href="#collections" className="nav-item" onClick={() => setMobileMenuOpen(false)}>Collections</a>
+          <a href="#bestsellers" className="nav-item" onClick={() => setMobileMenuOpen(false)}>Best Sellers</a>
           <span className="nav-item" onClick={() => { setMobileMenuOpen(false); navigate('/notifications'); }} style={{cursor: 'pointer', position: 'relative'}}>
             Notifications
             {unseenNotifCount > 0 && (
@@ -217,7 +219,7 @@ const Home = () => {
           </p>
           <button 
             className="btn-primary" 
-            onClick={() => document.getElementById('new')?.scrollIntoView({ behavior: 'smooth' })}
+            onClick={() => document.getElementById('all-collections')?.scrollIntoView({ behavior: 'smooth' })}
           >
             Explore Collection <ArrowRight size={18} />
           </button>
@@ -263,7 +265,7 @@ const Home = () => {
           <div style={{ textAlign: 'center', marginTop: '3rem' }}>
             <button 
               className="btn-primary" 
-              onClick={() => document.getElementById('collections')?.scrollIntoView({ behavior: 'smooth' })}
+              onClick={() => document.getElementById('all-collections')?.scrollIntoView({ behavior: 'smooth' })}
               style={{ padding: '0.8rem 2.5rem' }}
             >
               Explore More <ArrowRight size={18} />
@@ -272,19 +274,55 @@ const Home = () => {
         )}
       </section>
 
-      {/* Collections Section */}
-      <section className="collections-section" id="collections" style={{ background: 'var(--color-bg-primary)', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+      {/* Best Sellers Section */}
+      <section className="collections-section" id="bestsellers" style={{ background: 'var(--color-bg-primary)', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
         <div className="section-header">
-          <h2 className="section-title">Full <span className="text-gradient">Collections</span></h2>
+          <h2 className="section-title">Best <span className="text-gradient">Sellers</span></h2>
           <p className="section-subtitle">
-            Browse our entire range of premium handcrafted sarees.
+            Our most loved sarees, ranked by popularity.
+          </p>
+        </div>
+
+        <div className="collections-grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '2rem' }}>
+          {bestSellers.map(product => (
+            <div 
+              key={`best-${product.id}`} 
+              className="collection-card" 
+              onClick={() => navigate(`/product/${product.id}`)} 
+              style={{ cursor: 'pointer', height: '400px' }}
+            >
+              <img src={product.image1 || product.image1_url || 'https://via.placeholder.com/300x400'} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              
+              <button 
+                className={`like-btn ${wishlist.has(product.id) ? 'liked' : ''}`}
+                onClick={(e) => toggleWishlist(e, product.id)}
+                aria-label="Toggle Wishlist"
+              >
+                <Heart size={20} fill={wishlist.has(product.id) ? "currentColor" : "none"} />
+              </button>
+
+              <div className="collection-overlay" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.9), transparent)', height: '50%', justifyContent: 'flex-end', padding: '1.5rem' }}>
+                <h3 className="collection-name" style={{ fontSize: '1.4rem', marginBottom: '0.5rem' }}>{product.name}</h3>
+                <div style={{ color: 'var(--color-accent)', fontWeight: 'bold', fontSize: '1.2rem' }}>₹{product.price}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* All Collections Section */}
+      <section className="collections-section" id="all-collections" style={{ background: 'var(--color-bg-secondary)', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+        <div className="section-header">
+          <h2 className="section-title">All <span className="text-gradient">Collections</span></h2>
+          <p className="section-subtitle">
+            Browse our entire handcrafted range.
           </p>
         </div>
 
         <div className="collections-grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '2rem' }}>
           {filteredProducts.map(product => (
             <div 
-              key={`coll-${product.id}`} 
+              key={`all-${product.id}`} 
               className="collection-card" 
               onClick={() => navigate(`/product/${product.id}`)} 
               style={{ cursor: 'pointer', height: '400px' }}
