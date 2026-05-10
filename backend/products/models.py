@@ -15,10 +15,21 @@ class Product(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2)
     stock = models.IntegerField(default=0)
     image1 = models.ImageField(upload_to='product_images/', blank=True, null=True)
+    image1_url = models.URLField(max_length=500, blank=True, null=True)
     image2 = models.ImageField(upload_to='product_images/', blank=True, null=True)
+    image2_url = models.URLField(max_length=500, blank=True, null=True)
     image3 = models.ImageField(upload_to='product_images/', blank=True, null=True)
+    image3_url = models.URLField(max_length=500, blank=True, null=True)
     image4 = models.ImageField(upload_to='product_images/', blank=True, null=True)
+    image4_url = models.URLField(max_length=500, blank=True, null=True)
     image5 = models.ImageField(upload_to='product_images/', blank=True, null=True)
+    image5_url = models.URLField(max_length=500, blank=True, null=True)
+    
+    # Color Variants support
+    color_name = models.CharField(max_length=50, blank=True, null=True)
+    color_hex = models.CharField(max_length=7, blank=True, null=True, help_text="Hex code, e.g. #FF0000")
+    parent_product = models.ForeignKey('self', related_name='variants', on_delete=models.SET_NULL, blank=True, null=True)
+    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

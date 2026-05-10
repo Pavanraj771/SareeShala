@@ -193,7 +193,7 @@ const Home = () => {
               onClick={() => navigate(`/product/${product.id}`)} 
               style={{ cursor: 'pointer', height: '400px' }}
             >
-              <img src={product.image1 || 'https://via.placeholder.com/300x400'} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              <img src={product.image1 || product.image1_url || 'https://via.placeholder.com/300x400'} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               
               <button 
                 className={`like-btn ${wishlist.has(product.id) ? 'liked' : ''}`}

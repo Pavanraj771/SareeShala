@@ -22,7 +22,7 @@ def cart_view(request):
                 'id': product.id,
                 'name': product.name,
                 'price': str(product.price),
-                'image1': request.build_absolute_uri(product.image1.url) if product.image1 else None,
+                'image1': request.build_absolute_uri(product.image1.url) if product.image1 else product.image1_url,
                 'quantity': item.quantity,
                 'item_total': str(item_total),
             })
@@ -100,7 +100,7 @@ def my_orders_view(request):
         for item in order.items.all():
             items_data.append({
                 'product_name': item.product.name if item.product else 'Unknown Product',
-                'image': request.build_absolute_uri(item.product.image1.url) if item.product and item.product.image1 else None,
+                'image': request.build_absolute_uri(item.product.image1.url) if item.product and item.product.image1 else (item.product.image1_url if item.product else None),
                 'quantity': item.quantity,
                 'price_at_purchase': str(item.price_at_purchase),
             })

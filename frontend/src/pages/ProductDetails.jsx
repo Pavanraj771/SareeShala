@@ -24,7 +24,7 @@ const ProductDetails = () => {
       try {
         const res = await axios.get(`${API_URL}/api/products/${id}/`);
         setProduct(res.data);
-        setMainImage(res.data.image1 || 'https://via.placeholder.com/400');
+        setMainImage(res.data.image1 || res.data.image1_url || 'https://via.placeholder.com/400');
         setLoading(false);
       } catch (err) {
         setError('Failed to fetch product details.');
@@ -102,7 +102,13 @@ const ProductDetails = () => {
   if (error) return <div className="error-state">{error}</div>;
   if (!product) return null;
 
-  const images = [product.image1, product.image2, product.image3, product.image4, product.image5].filter(Boolean);
+  const images = [
+    product.image1 || product.image1_url,
+    product.image2 || product.image2_url,
+    product.image3 || product.image3_url,
+    product.image4 || product.image4_url,
+    product.image5 || product.image5_url
+  ].filter(Boolean);
 
   return (
     <div className="product-details-container animate-fade-in">
@@ -141,6 +147,40 @@ const ProductDetails = () => {
               <span className="out-of-stock">Out of Stock</span>
             )}
           </div>
+
+          {product.color_variants && product.color_variants.length > 1 && (
+            <div className="product-variants" style={{ marginTop: '1.5rem', marginBottom: '1.5rem' }}>
+              <h3 style={{ fontSize: '1rem', color: '#ccc', marginBottom: '10px' }}>Available Colors</h3>
+              <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                {product.color_variants.map(variant => (
+                  <div 
+                    key={variant.id}
+                    onClick={() => navigate(`/product/${variant.id}`)}
+                    title={variant.color_name}
+                    style={{ 
+                      width: '35px', 
+                      height: '35px', 
+                      borderRadius: '50%', 
+                      background: variant.color_hex || '#ccc', 
+                      cursor: 'pointer',
+                      border: variant.id === parseInt(id) ? '3px solid #d4af37' : '1px solid #555',
+                      boxShadow: variant.id === parseInt(id) ? '0 0 10px rgba(212,175,55,0.5)' : 'none',
+                      transition: 'all 0.2s ease',
+                    }}
+                    onMouseOver={(e) => {
+                      e.currentTarget.style.transform = 'scale(1.15)';
+                      e.currentTarget.style.borderColor = '#d4af37';
+                    }}
+                    onMouseOut={(e) => {
+                      e.currentTarget.style.transform = 'scale(1)';
+                      if (variant.id !== parseInt(id)) e.currentTarget.style.borderColor = '#555';
+                    }}
+                  />
+                ))}
+              </div>
+              {product.color_name && <p style={{ fontSize: '0.8rem', color: '#888', marginTop: '8px' }}>Selected: <strong>{product.color_name}</strong></p>}
+            </div>
+          )}
 
           <div className="product-description">
             <h3>Description</h3>

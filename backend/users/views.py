@@ -411,7 +411,7 @@ def wishlist_view(request):
                 'id': product.id,
                 'name': product.name,
                 'price': str(product.price),
-                'image1': request.build_absolute_uri(product.image1.url) if product.image1 else None,
+                'image1': request.build_absolute_uri(product.image1.url) if product.image1 else product.image1_url,
             })
         return Response(data)
     
@@ -468,6 +468,8 @@ def admin_user_details(request, user_id):
                 image_url = None
                 if item.product and item.product.image1:
                     image_url = request.build_absolute_uri(item.product.image1.url)
+                elif item.product and item.product.image1_url:
+                    image_url = item.product.image1_url
                     
                 items_data.append({
                     'id': item.id,
@@ -495,7 +497,7 @@ def admin_user_details(request, user_id):
             'quantity': c.quantity,
             'price': str(c.product.price),
             'added_at': c.added_at.strftime('%Y-%m-%d %H:%M:%S'),
-            'image': request.build_absolute_uri(c.product.image1.url) if c.product and c.product.image1 else None
+            'image': request.build_absolute_uri(c.product.image1.url) if c.product and c.product.image1 else (c.product.image1_url if c.product else None)
         } for c in cart_items]
         
         wishlist_items = Wishlist.objects.filter(user=user).select_related('product')
@@ -505,7 +507,7 @@ def admin_user_details(request, user_id):
             'product_name': w.product.name,
             'price': str(w.product.price),
             'added_at': w.created_at.strftime('%Y-%m-%d %H:%M:%S'),
-            'image': request.build_absolute_uri(w.product.image1.url) if w.product and w.product.image1 else None
+            'image': request.build_absolute_uri(w.product.image1.url) if w.product and w.product.image1 else (w.product.image1_url if w.product else None)
         } for w in wishlist_items]
         
         return Response({
