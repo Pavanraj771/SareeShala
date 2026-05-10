@@ -8,6 +8,9 @@ from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
+from django.utils.crypto import get_random_string
+import traceback
+import requests
 from .models import CustomUser, OTPVerification
 
 
@@ -260,32 +263,36 @@ def login(request):
 def google_login(request):
     """
     POST /api/users/google/
-    Body: { token } (Google ID Token)
+    Body: { token } (Google ID Token or Access Token)
     """
     token = request.data.get('token')
     if not token:
         return Response({'error': 'Token is required.'}, status=status.HTTP_400_BAD_REQUEST)
 
     try:
-        import requests as httpx_requests
         # Try as ID token first
+        idinfo = None
         try:
             idinfo = id_token.verify_oauth2_token(token, google_requests.Request())
             if idinfo['iss'] not in ['accounts.google.com', 'https://accounts.google.com']:
-                raise ValueError('Wrong issuer.')
-        except ValueError:
+                idinfo = None
+        except Exception:
+            idinfo = None
+
+        if not idinfo:
             # Try as access token
-            resp = httpx_requests.get(
+            resp = requests.get(
                 'https://www.googleapis.com/oauth2/v3/userinfo',
-                headers={'Authorization': f'Bearer {token}'}
+                headers={'Authorization': f'Bearer {token}'},
+                timeout=10
             )
             if not resp.ok:
-                raise ValueError('Invalid Google token.')
+                return Response({'error': 'Invalid Google token or failed to fetch user info.'}, status=status.HTTP_400_BAD_REQUEST)
             idinfo = resp.json()
 
         email = idinfo.get('email')
         if not email:
-            return Response({'error': 'Google token did not provide an email.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'Google account did not provide an email.'}, status=status.HTTP_400_BAD_REQUEST)
 
         first_name = idinfo.get('given_name', '')
         last_name = idinfo.get('family_name', '')
@@ -304,7 +311,7 @@ def google_login(request):
             user = CustomUser.objects.create_user(
                 username=username,
                 email=email,
-                password=CustomUser.objects.make_random_password(length=12),
+                password=get_random_string(16),
                 first_name=first_name,
                 last_name=last_name,
             )
@@ -319,9 +326,10 @@ def google_login(request):
             'is_staff':   user.is_staff,
             **tokens,
         })
-    except ValueError as e:
-        print(f"[Google Auth] Invalid token: {e}")
-        return Response({'error': 'Invalid Google token.'}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        print(f"[Google Auth Error] {str(e)}")
+        traceback.print_exc()
+        return Response({'error': f'Internal server error during Google login: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 # ─────────────────────────────────────────────

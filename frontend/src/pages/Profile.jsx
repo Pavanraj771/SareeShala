@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   User, Mail, Phone, MapPin, ShoppingBag,
-  Heart, Star, Settings, LogOut, Edit2, Save, X, Package
+  Heart, Star, Settings, LogOut, Edit2, Save, X, Package, Loader2
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import './Profile.css';
+import { API_URL } from '../config';
 
 const statCards = [
   { icon: <ShoppingBag size={20} />, label: 'Total Orders', value: '12', color: '#d4af37' },
@@ -15,7 +16,7 @@ const statCards = [
 ];
 
 const Profile = () => {
-  const { user, logout, login } = useAuth();
+  const { user, logout, updateUser } = useAuth();
   const navigate = useNavigate();
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({
@@ -26,6 +27,50 @@ const Profile = () => {
     address:   user?.address   || '',
   });
   const [saved, setSaved] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [fetching, setFetching] = useState(true);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/users/me/`, {
+          headers: {
+            'Authorization': `Bearer ${user.token}`,
+          },
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const updatedUser = {
+            ...user,
+            firstName: data.first_name,
+            lastName:  data.last_name,
+            email:     data.email,
+            phone:     data.phone_number,
+            address:   data.address,
+            dateJoined: data.date_joined,
+          };
+          updateUser(updatedUser);
+          setForm({
+            firstName: data.first_name || '',
+            lastName:  data.last_name  || '',
+            email:     data.email      || '',
+            phone:     data.phone_number || '',
+            address:   data.address    || '',
+          });
+        }
+      } catch (err) {
+        console.error('Failed to fetch user data:', err);
+      } finally {
+        setFetching(false);
+      }
+    };
+
+    if (user?.token) {
+      fetchUserData();
+    } else {
+      setFetching(false);
+    }
+  }, []);
 
   if (!user) {
     return (
@@ -45,12 +90,38 @@ const Profile = () => {
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
-  const handleSave = () => {
-    // Update context with new info
-    login({ ...user, ...form });
-    setEditing(false);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
+  const handleSave = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch(`${API_URL}/api/users/me/update/`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${user.token}`,
+        },
+        body: JSON.stringify({
+          first_name:   form.firstName,
+          last_name:    form.lastName,
+          phone_number: form.phone,
+          address:      form.address,
+        }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Failed to update profile');
+      }
+
+      // Update context with new info
+      updateUser({ ...user, ...form });
+      setEditing(false);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleCancel = () => {
@@ -142,10 +213,11 @@ const Profile = () => {
                 </button>
               ) : (
                 <div className="edit-actions">
-                  <button id="save-profile-btn" className="save-btn" onClick={handleSave}>
-                    <Save size={14} /> Save
+                  <button id="save-profile-btn" className="save-btn" onClick={handleSave} disabled={loading}>
+                    {loading ? <Loader2 size={14} className="spin" /> : <Save size={14} />}
+                    {loading ? 'Saving...' : 'Save'}
                   </button>
-                  <button id="cancel-edit-btn" className="cancel-btn" onClick={handleCancel}>
+                  <button id="cancel-edit-btn" className="cancel-btn" onClick={handleCancel} disabled={loading}>
                     <X size={14} /> Cancel
                   </button>
                 </div>
@@ -181,6 +253,7 @@ const Profile = () => {
                 value={form.email}
                 editing={editing}
                 onChange={handleChange}
+                disabled={true}
               />
               <InfoField
                 icon={<Phone size={16}/>}
@@ -224,7 +297,7 @@ const Profile = () => {
               </div>
               <div className="info-field">
                 <label className="field-label">🔖 Member Since</label>
-                <p className="field-value">April 2025</p>
+                <p className="field-value">{user.dateJoined || 'N/A'}</p>
               </div>
               <div className="info-field">
                 <label className="field-label">🎯 Account Type</label>
@@ -247,7 +320,7 @@ const Profile = () => {
 };
 
 /* ── Reusable info field ── */
-const InfoField = ({ icon, label, name, value, editing, onChange, type = 'text', placeholder = '' }) => (
+const InfoField = ({ icon, label, name, value, editing, onChange, type = 'text', placeholder = '', disabled = false }) => (
   <div className="info-field">
     <label className="field-label">{icon} {label}</label>
     {editing ? (
@@ -256,8 +329,9 @@ const InfoField = ({ icon, label, name, value, editing, onChange, type = 'text',
         name={name}
         value={value}
         onChange={onChange}
-        className="field-input"
+        className={`field-input ${disabled ? 'field-input-disabled' : ''}`}
         placeholder={placeholder || `Enter ${label.toLowerCase()}`}
+        disabled={disabled}
       />
     ) : (
       <p className="field-value">{value || <span className="empty-val">{placeholder || 'Not provided'}</span>}</p>

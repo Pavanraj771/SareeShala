@@ -38,8 +38,13 @@ export const AuthProvider = ({ children }) => {
     showMessage('Successfully logged out!');
   };
 
+  const updateUser = (newData) => {
+    setUser(newData);
+    localStorage.setItem('sareeShala_user', JSON.stringify(newData));
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading, showMessage }}>
+    <AuthContext.Provider value={{ user, login, logout, updateUser, loading, showMessage }}>
       {children}
       {toastMessage && (
         <div className="auth-toast-overlay">

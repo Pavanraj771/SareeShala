@@ -17,8 +17,21 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework_simplejwt.views import TokenRefreshView
+from django.http import JsonResponse
+
+def home(request):
+    return JsonResponse({
+        "message": "Welcome to SareeShala API",
+        "status": "Running",
+        "endpoints": {
+            "users": "/api/users/",
+            "products": "/api/products/",
+            "orders": "/api/orders/"
+        }
+    })
 
 urlpatterns = [
+    path('',                home,                  name='home'),
     path('admin/',          admin.site.urls),
     path('api/users/',      include('users.urls')),
     path('api/products/',   include('products.urls')),

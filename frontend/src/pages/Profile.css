@@ -340,6 +340,13 @@
 .field-input:focus { border-color: var(--color-accent-primary); }
 
 .field-textarea { resize: vertical; min-height: 70px; }
+.field-input-disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: rgba(255,255,255,0.02);
+  border-color: rgba(255,255,255,0.05);
+  color: var(--color-text-secondary);
+}
 
 /* Badges */
 .badge-customer, .badge-active {

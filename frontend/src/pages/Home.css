@@ -86,6 +86,39 @@
   transform: scale(1.1);
 }
 
+.action-btn.active {
+  color: var(--color-accent-primary);
+}
+
+.search-bar-container {
+  display: flex;
+  align-items: center;
+  margin-right: 10px;
+}
+
+.search-input {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 20px;
+  padding: 6px 15px;
+  color: white;
+  font-size: 0.85rem;
+  outline: none;
+  width: 180px;
+  transition: all 0.3s ease;
+}
+
+.search-input:focus {
+  width: 240px;
+  border-color: var(--color-accent-primary);
+  background: rgba(255,255,255,0.12);
+}
+
+@media (max-width: 600px) {
+  .search-input { width: 100px; }
+  .search-input:focus { width: 140px; }
+}
+
 /* Hero Section */
 .hero-section {
   height: 100vh;

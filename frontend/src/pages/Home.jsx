@@ -14,6 +14,8 @@ const Home = () => {
   const [cartCount, setCartCount] = useState(0);
   const [unseenCartCount, setUnseenCartCount] = useState(0);
   const [unseenNotifCount, setUnseenNotifCount] = useState(0);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   
   const navigate = useNavigate();
   const { user, showMessage } = useAuth();
@@ -116,11 +118,34 @@ const Home = () => {
     }
   };
 
+  const filteredProducts = products.filter(product => {
+    const query = searchQuery.toLowerCase().trim();
+    if (!query) return true;
+
+    // Check if query is a number (price filter)
+    const priceQuery = parseFloat(query);
+    if (!isNaN(priceQuery)) {
+      return product.price <= priceQuery;
+    }
+
+    // Otherwise search in name and description
+    return (
+      product.name.toLowerCase().includes(query) ||
+      (product.description && product.description.toLowerCase().includes(query))
+    );
+  });
+
   return (
     <div className="home-container">
       {/* Navigation */}
       <nav className={`navbar ${scrolled ? 'scrolled' : ''}`}>
-        <div className="logo text-gradient">SAREESHALA</div>
+        <div 
+          className="logo text-gradient" 
+          onClick={() => { window.scrollTo({ top: 0, behavior: 'smooth' }); navigate('/'); }}
+          style={{ cursor: 'pointer' }}
+        >
+          SAREESHALA
+        </div>
         
         <div className={`nav-links ${mobileMenuOpen ? 'mobile-open' : ''}`}>
           <a href="#new" className="nav-item" onClick={() => setMobileMenuOpen(false)}>New Arrivals</a>
@@ -137,8 +162,28 @@ const Home = () => {
         </div>
         
         <div className="nav-actions">
-          <button id="search-btn" className="action-btn" aria-label="Search">
-            <Search size={20} />
+          {isSearchOpen && (
+            <div className="search-bar-container animate-fade-in">
+              <input 
+                type="text" 
+                placeholder="Search sarees..." 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                autoFocus
+                className="search-input"
+              />
+            </div>
+          )}
+          <button 
+            id="search-btn" 
+            className={`action-btn ${isSearchOpen ? 'active' : ''}`} 
+            aria-label="Search"
+            onClick={() => {
+              setIsSearchOpen(!isSearchOpen);
+              if (isSearchOpen) setSearchQuery('');
+            }}
+          >
+            {isSearchOpen ? <X size={20} /> : <Search size={20} />}
           </button>
           <button id="cart-nav-btn" className="action-btn" style={{ position: 'relative' }} aria-label="Cart" onClick={() => navigate('/cart')}>
             <ShoppingBag size={20} />
@@ -170,25 +215,28 @@ const Home = () => {
             crafted by master weavers across India. Experience the true 
             essence of royal heritage.
           </p>
-          <button className="btn-primary">
+          <button 
+            className="btn-primary" 
+            onClick={() => document.getElementById('new')?.scrollIntoView({ behavior: 'smooth' })}
+          >
             Explore Collection <ArrowRight size={18} />
           </button>
         </div>
       </section>
 
-      {/* Collections Section */}
-      <section className="collections-section" id="collections">
+      {/* New Arrivals Section */}
+      <section className="collections-section" id="new">
         <div className="section-header">
           <h2 className="section-title">New <span className="text-gradient">Arrivals</span></h2>
           <p className="section-subtitle">
-            Explore our latest additions to the collection, from Kanchipuram to Banaras.
+            Our latest additions, carefully curated for you.
           </p>
         </div>
 
         <div className="collections-grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '2rem' }}>
-          {products.map(product => (
+          {filteredProducts.slice(0, 12).map(product => (
             <div 
-              key={product.id} 
+              key={`new-${product.id}`} 
               className="collection-card" 
               onClick={() => navigate(`/product/${product.id}`)} 
               style={{ cursor: 'pointer', height: '400px' }}
@@ -209,9 +257,54 @@ const Home = () => {
               </div>
             </div>
           ))}
-          {products.length === 0 && (
-            <p style={{ gridColumn: '1 / -1', textAlign: 'center', color: '#888' }}>No products found. Stay tuned for new arrivals!</p>
-          )}
+        </div>
+
+        {filteredProducts.length > 12 && (
+          <div style={{ textAlign: 'center', marginTop: '3rem' }}>
+            <button 
+              className="btn-primary" 
+              onClick={() => document.getElementById('collections')?.scrollIntoView({ behavior: 'smooth' })}
+              style={{ padding: '0.8rem 2.5rem' }}
+            >
+              Explore More <ArrowRight size={18} />
+            </button>
+          </div>
+        )}
+      </section>
+
+      {/* Collections Section */}
+      <section className="collections-section" id="collections" style={{ background: 'var(--color-bg-primary)', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+        <div className="section-header">
+          <h2 className="section-title">Full <span className="text-gradient">Collections</span></h2>
+          <p className="section-subtitle">
+            Browse our entire range of premium handcrafted sarees.
+          </p>
+        </div>
+
+        <div className="collections-grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '2rem' }}>
+          {filteredProducts.map(product => (
+            <div 
+              key={`coll-${product.id}`} 
+              className="collection-card" 
+              onClick={() => navigate(`/product/${product.id}`)} 
+              style={{ cursor: 'pointer', height: '400px' }}
+            >
+              <img src={product.image1 || product.image1_url || 'https://via.placeholder.com/300x400'} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              
+              <button 
+                className={`like-btn ${wishlist.has(product.id) ? 'liked' : ''}`}
+                onClick={(e) => toggleWishlist(e, product.id)}
+                aria-label="Toggle Wishlist"
+              >
+                <Heart size={20} fill={wishlist.has(product.id) ? "currentColor" : "none"} />
+              </button>
+
+              <div className="collection-overlay" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.9), transparent)', height: '50%', justifyContent: 'flex-end', padding: '1.5rem' }}>
+                <h3 className="collection-name" style={{ fontSize: '1.4rem', marginBottom: '0.5rem' }}>{product.name}</h3>
+                <div style={{ color: 'var(--color-accent)', fontWeight: 'bold', fontSize: '1.2rem' }}>₹{product.price}</div>
+              </div>
+            </div>
+          ))}
         </div>
       </section>
 
