@@ -2,7 +2,8 @@ from rest_framework.decorators import api_view, permission_classes, authenticati
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
 from rest_framework.response import Response
 from rest_framework import status
-from products.models import Product
+from products.models import Product, Review
+from users.models import Notification
 from .models import CartItem, Order, OrderItem
 
 @api_view(['GET', 'POST', 'DELETE'])
@@ -159,7 +160,24 @@ def admin_orders_view(request, order_id=None):
         new_status = request.data.get('status')
         reason = request.data.get('admin_cancellation_reason')
         if new_status in dict(Order.STATUS_CHOICES):
+            old_status = order.status
             order.status = new_status
+            
+            # If status changed to DELIVERED, create notifications for review
+            if new_status == 'DELIVERED' and old_status != 'DELIVERED':
+                order_items = order.items.all()
+                for item in order_items:
+                    if item.product:
+                        Notification.objects.create(
+                            user=order.user,
+                            title="Item Delivered! ✨",
+                            message=f"Your '{item.product.name}' has been delivered successfully. We'd love to hear your feedback!",
+                            type='review_prompt',
+                            order_id=order.id,
+                            product_id=item.product.id,
+                            product_name=item.product.name
+                        )
+
             if new_status == 'CANCELLED' and reason:
                 order.admin_cancellation_reason = reason
             elif new_status != 'CANCELLED':

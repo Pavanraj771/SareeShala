@@ -11,7 +11,74 @@ from google.auth.transport import requests as google_requests
 from django.utils.crypto import get_random_string
 import traceback
 import requests
-from .models import CustomUser, OTPVerification, Wishlist
+from .models import CustomUser, OTPVerification, Wishlist, Notification
+
+# ... (rest of imports and previous functions)
+
+# ─────────────────────────────────────────────
+#  Notifications & Reviews
+# ─────────────────────────────────────────────
+
+@api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])
+def notifications_view(request):
+    user = request.user
+    if request.method == 'GET':
+        notifications = Notification.objects.filter(user=user)
+        data = [{
+            'id': n.id,
+            'title': n.title,
+            'message': n.message,
+            'is_seen': n.is_seen,
+            'type': n.type,
+            'product_id': n.product_id,
+            'product_name': n.product_name,
+            'order_id': n.order_id,
+            'created_at': n.created_at
+        } for n in notifications]
+        return Response(data)
+    
+    elif request.method == 'POST':
+        notif_id = request.data.get('notification_id')
+        try:
+            n = Notification.objects.get(id=notif_id, user=user)
+            n.is_seen = True
+            n.save()
+            return Response({'message': 'Marked as seen'})
+        except Notification.DoesNotExist:
+            return Response({'error': 'Not found'}, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def submit_review(request):
+    user = request.user
+    product_id = request.data.get('product_id')
+    rating = request.data.get('rating', 5)
+    comment = request.data.get('comment')
+    
+    try:
+        product = Product.objects.get(id=product_id)
+        Review.objects.create(
+            user=user,
+            product=product,
+            rating=rating,
+            comment=comment
+        )
+        return Response({'message': 'Review submitted successfully!'})
+    except Product.DoesNotExist:
+        return Response({'error': 'Product not found'}, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def product_reviews(request, product_id):
+    reviews = Review.objects.filter(product_id=product_id).select_related('user')
+    data = [{
+        'username': r.user.username,
+        'rating': r.rating,
+        'comment': r.comment,
+        'created_at': r.created_at
+    } for r in reviews]
+    return Response(data)
 from orders.models import Order
 from products.models import Review
 
@@ -642,4 +709,19 @@ def admin_delete_user(request, user_id):
         return Response({'message': 'User deleted successfully.'})
     except CustomUser.DoesNotExist:
         return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def user_reviews(request):
+    reviews = Review.objects.filter(user=request.user).select_related('product')
+    data = []
+    for r in reviews:
+        data.append({
+            'id': r.id,
+            'product_name': r.product.name if r.product else 'Unknown',
+            'rating': r.rating,
+            'comment': r.comment,
+            'created_at': r.created_at
+        })
+    return Response(data)
 

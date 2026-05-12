@@ -75,39 +75,51 @@ const Orders = () => {
             ) : (
               <div className="orders-list">
                 {orders.map((o) => (
-                  <div className="order-card glass-panel" key={o.id} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', padding: '1.5rem', alignItems: 'flex-start' }}>
+                  <div className="order-card" key={o.id}>
                     
                     {/* Header: Order ID, Date, Status, Total */}
-                    <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '1rem' }}>
+                    <div className="order-header">
                       <div>
-                        <p style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>Order #{o.id}</p>
-                        <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.85rem' }}>
-                          <Clock size={12}/> {new Date(o.created_at).toLocaleDateString()}
+                        <p className="order-id">Order #{o.id}</p>
+                        <p className="order-date">
+                          <Clock size={14}/> {new Date(o.created_at).toLocaleDateString(undefined, { dateStyle: 'medium' })}
                         </p>
                       </div>
                       <div style={{ textAlign: 'right' }}>
-                        <span className="order-status" style={{ color: getStatusColor(o.status), background: `${getStatusColor(o.status)}18`, border: `1px solid ${getStatusColor(o.status)}44`, padding: '4px 10px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: 'bold' }}>
+                        <span className="order-status" style={{ 
+                          color: getStatusColor(o.status), 
+                          background: `${getStatusColor(o.status)}15`, 
+                          border: `1px solid ${getStatusColor(o.status)}30` 
+                        }}>
                           {o.status}
                         </span>
-                        <p style={{ marginTop: '0.5rem', fontWeight: 'bold' }}>Total: ₹{parseFloat(o.total_amount).toLocaleString()}</p>
+                        <p style={{ marginTop: '0.8rem', fontWeight: '500', color: 'var(--color-text-primary)' }}>
+                          Total: <span style={{ color: 'var(--color-accent-primary)' }}>₹{parseFloat(o.total_amount).toLocaleString()}</span>
+                        </p>
                       </div>
                     </div>
-
+ 
                     {/* Items List */}
-                    <div style={{ width: '100%' }}>
+                    <div className="order-items-container" style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                       {o.items.map((item, idx) => (
-                        <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.5rem' }}>
-                          <div style={{ width: '40px', height: '40px', borderRadius: '4px', overflow: 'hidden', background: 'rgba(255,255,255,0.1)' }}>
-                            {item.image ? <img src={item.image} alt="product" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <span style={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%'}}>🥻</span>}
+                        <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '1.2rem' }}>
+                          <div style={{ width: '50px', height: '60px', borderRadius: '8px', overflow: 'hidden', background: 'var(--border-subtle)', flexShrink: 0 }}>
+                            {item.image ? (
+                              <img src={item.image} alt="product" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            ) : (
+                              <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', fontSize: '1.5rem'}}>🥻</div>
+                            )}
                           </div>
-                          <div>
-                            <p style={{ fontSize: '0.95rem' }}>{item.product_name} (x{item.quantity})</p>
-                            <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.85rem' }}>₹{parseFloat(item.price_at_purchase).toLocaleString()}</p>
+                          <div style={{ flex: 1 }}>
+                            <p style={{ fontSize: '1rem', color: 'var(--color-text-primary)', marginBottom: '2px' }}>{item.product_name}</p>
+                            <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.85rem' }}>
+                              Qty: {item.quantity} • ₹{parseFloat(item.price_at_purchase).toLocaleString()}
+                            </p>
                           </div>
                         </div>
                       ))}
                     </div>
-
+ 
                   </div>
                 ))}
               </div>

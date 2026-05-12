@@ -59,12 +59,12 @@ const Footer = () => {
           <h3 className="footer-heading">Contact Us</h3>
           <ul className="contact-info">
             <li><MapPin size={18} className="contact-icon" /> Chandur, Nalgonda, Telangana, India - 508255</li>
-            <li><Phone size={18} className="contact-icon" /> +91 6302562375</li>
+            <li><Phone size={18} className="contact-icon" /> +91 9676230799</li>
             <li><Mail size={18} className="contact-icon" /> sareeshala@gmail.com</li>
           </ul>
         </div>
       </div>
-      
+
       <div className="footer-bottom">
         <p>&copy; {new Date().getFullYear()} SareeShala. All rights reserved.</p>
         <div className="legal-links">

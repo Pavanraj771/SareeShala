@@ -16,4 +16,10 @@ urlpatterns = [
     path('admin/users/<int:user_id>/details/', views.admin_user_details, name='admin-user-details'),
     path('admin/users/<int:user_id>/toggle-block/', views.admin_toggle_user, name='admin-toggle-user'),
     path('admin/users/<int:user_id>/', views.admin_delete_user, name='admin-delete-user'),
+    
+    # Notifications & Reviews
+    path('notifications/', views.notifications_view, name='user-notifications'),
+    path('reviews/submit/', views.submit_review, name='submit-review'),
+    path('reviews/product/<int:product_id>/', views.product_reviews, name='product-reviews'),
+    path('reviews/my-reviews/', views.user_reviews, name='user-reviews'),
 ]

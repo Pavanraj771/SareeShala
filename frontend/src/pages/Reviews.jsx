@@ -1,18 +1,40 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Star, ArrowLeft } from 'lucide-react';
+import { Star, ArrowLeft, MessageSquare } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import './StubPage.css';
-
-const mockReviews = [
-  { id: 1, product: 'Red Banarasi Silk Saree',  stars: 5, text: 'Absolutely gorgeous! The quality is outstanding and the colors are vibrant. Worth every rupee.', date: '20 Apr 2025' },
-  { id: 2, product: 'Blue Kanjivaram Saree',     stars: 4, text: 'Beautiful weave and great packaging. Slightly different shade than pictures but still lovely.', date: '15 Mar 2025' },
-  { id: 3, product: 'Yellow Cotton Saree',       stars: 5, text: 'Perfect for daily wear! Very comfortable and the block print is stunning. Will buy again.', date: '5 Feb 2025' },
-];
+import { API_URL } from '../config';
 
 const Reviews = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [reviews, setReviews] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+
+    const fetchReviews = async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/users/reviews/my-reviews/`, {
+          headers: { 'Authorization': `Bearer ${user.token}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setReviews(data);
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchReviews();
+  }, [user]);
 
   if (!user) {
     return (
@@ -30,23 +52,44 @@ const Reviews = () => {
   return (
     <div className="stub-page">
       <div className="stub-bg"><div className="s-orb orb-gold"/><div className="s-orb orb-purple"/></div>
-      <div className="stub-content animate-fade-in">
+      <div className="stub-content animate-fade-in" style={{ maxWidth: '800px' }}>
         <button className="stub-back" onClick={() => navigate(-1)}><ArrowLeft size={16}/> Back</button>
-        <h1 className="stub-title"><Star size={28}/> My Reviews</h1>
-        <p className="stub-sub">{mockReviews.length} reviews written</p>
+        <h1 className="stub-title"><MessageSquare size={28}/> My Reviews</h1>
+        
+        {loading ? (
+          <p className="stub-sub">Loading your reviews...</p>
+        ) : (
+          <>
+            <p className="stub-sub">{reviews.length} review{reviews.length !== 1 ? 's' : ''} written</p>
 
-        <div className="reviews-list">
-          {mockReviews.map((r) => (
-            <div className="review-card glass-panel" key={r.id}>
-              <div className="review-header">
-                <p className="review-product">{r.product}</p>
-                <span className="review-stars">{'★'.repeat(r.stars)}{'☆'.repeat(5 - r.stars)}</span>
-              </div>
-              <p className="review-text">"{r.text}"</p>
-              <p className="review-date">{r.date}</p>
+            <div className="reviews-list">
+              {reviews.length === 0 ? (
+                <div className="empty-state">
+                  <span className="empty-icon">✍️</span>
+                  <p>You haven't written any reviews yet.</p>
+                  <button className="btn-primary" onClick={() => navigate('/orders')}>View Orders</button>
+                </div>
+              ) : (
+                reviews.map((r) => (
+                  <div className="review-card glass-panel" key={r.id} style={{ background: 'var(--color-bg-secondary)', border: '1px solid var(--border-subtle)', padding: '1.5rem', borderRadius: 'var(--border-radius-md)' }}>
+                    <div className="review-header" style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <p className="review-product" style={{ fontSize: '1.1rem', fontWeight: '500', color: 'var(--color-text-primary)' }}>{r.product_name}</p>
+                      <div style={{ display: 'flex', gap: '2px' }}>
+                        {[1, 2, 3, 4, 5].map(star => (
+                          <Star key={star} size={16} fill={star <= r.rating ? 'var(--color-accent-primary)' : 'none'} color={star <= r.rating ? 'var(--color-accent-primary)' : 'var(--color-text-secondary)'} />
+                        ))}
+                      </div>
+                    </div>
+                    <p className="review-text" style={{ color: 'var(--color-text-secondary)', fontSize: '1rem', fontStyle: 'italic', lineHeight: '1.6', marginBottom: '1rem' }}>"{r.comment}"</p>
+                    <p className="review-date" style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>
+                      {new Date(r.created_at).toLocaleDateString(undefined, { dateStyle: 'medium' })}
+                    </p>
+                  </div>
+                ))
+              )}
             </div>
-          ))}
-        </div>
+          </>
+        )}
       </div>
     </div>
   );

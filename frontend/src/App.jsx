@@ -18,32 +18,36 @@ import Checkout        from './pages/Checkout'
 import Notifications   from './pages/Notifications'
 import Footer          from './components/Footer'
 
+import { ThemeProvider } from './context/ThemeContext'
+
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <div className="app-wrapper">
-          <Routes>
-          <Route path="/"                element={<Home />} />
-          <Route path="/login"           element={<Login />} />
-          <Route path="/signup"          element={<Signup />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/profile"         element={<Profile />} />
-          <Route path="/orders"          element={<Orders />} />
-          <Route path="/wishlist"        element={<Wishlist />} />
-          <Route path="/cart"            element={<Cart />} />
-          <Route path="/reviews"         element={<Reviews />} />
-          <Route path="/settings"        element={<AccountSettings />} />
-          <Route path="/admin"           element={<AdminDashboard />} />
-          <Route path="/product/:id"     element={<ProductDetails />} />
-          <Route path="/faq"             element={<FAQ />} />
-          <Route path="/checkout"        element={<Checkout />} />
-          <Route path="/notifications"   element={<Notifications />} />
-          </Routes>
-          <Footer />
-        </div>
-      </Router>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <Router>
+          <div className="app-wrapper">
+            <Routes>
+            <Route path="/"                element={<Home />} />
+            <Route path="/login"           element={<Login />} />
+            <Route path="/signup"          element={<Signup />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/profile"         element={<Profile />} />
+            <Route path="/orders"          element={<Orders />} />
+            <Route path="/wishlist"        element={<Wishlist />} />
+            <Route path="/cart"            element={<Cart />} />
+            <Route path="/reviews"         element={<Reviews />} />
+            <Route path="/settings"        element={<AccountSettings />} />
+            <Route path="/admin"           element={<AdminDashboard />} />
+            <Route path="/product/:id"     element={<ProductDetails />} />
+            <Route path="/faq"             element={<FAQ />} />
+            <Route path="/checkout"        element={<Checkout />} />
+            <Route path="/notifications"   element={<Notifications />} />
+            </Routes>
+            <Footer />
+          </div>
+        </Router>
+      </AuthProvider>
+    </ThemeProvider>
   )
 }
 

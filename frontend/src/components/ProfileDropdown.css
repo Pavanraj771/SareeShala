@@ -12,8 +12,8 @@
   align-items: center;
   gap: 0.45rem;
   padding: 6px 12px 6px 6px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--border-subtle);
+  border: 1px solid var(--border-subtle);
   border-radius: 50px;
   cursor: pointer;
   color: var(--color-text-primary);
@@ -37,14 +37,14 @@
   align-items: center;
   justify-content: center;
   color: #000;
-  font-weight: 700;
+  font-weight: 500;
   font-size: 0.8rem;
   flex-shrink: 0;
 }
 
 .avatar-initials {
   font-family: var(--font-sans);
-  font-weight: 700;
+  font-weight: 500;
 }
 
 .profile-name-label {
@@ -71,10 +71,10 @@
   top: calc(100% + 12px);
   right: 0;
   width: 280px;
-  background: rgba(16, 16, 20, 0.96);
+  background: var(--color-bg-secondary);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--border-radius-md);
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(212, 175, 55, 0.08);
   overflow: hidden;
@@ -109,7 +109,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
+  font-weight: 500;
   font-size: 1.1rem;
   color: #000;
   flex-shrink: 0;
@@ -158,7 +158,7 @@
 /* ── Divider ── */
 .dropdown-divider {
   height: 1px;
-  background: rgba(255, 255, 255, 0.07);
+  background: var(--border-subtle);
   margin: 4px 0;
 }
 
@@ -181,7 +181,7 @@
 }
 
 .dropdown-item:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--border-subtle);
   color: var(--color-text-primary);
 }
 
@@ -200,7 +200,7 @@
   width: calc(100% - 24px);
   border-radius: 10px;
   padding: 10px 14px;
-  font-weight: 600 !important;
+  font-weight: 500 !important;
 }
 
 .login-btn {

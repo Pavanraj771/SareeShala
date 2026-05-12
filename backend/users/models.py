@@ -43,6 +43,25 @@ class OTPVerification(models.Model):
     def __str__(self):
         return f"{self.email} | {self.purpose} | {self.otp_code}"
 
+class Notification(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='notifications')
+    title = models.CharField(max_length=255)
+    message = models.TextField()
+    is_seen = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    # For review prompts
+    order_id = models.IntegerField(null=True, blank=True)
+    product_id = models.IntegerField(null=True, blank=True)
+    product_name = models.CharField(max_length=255, null=True, blank=True)
+    type = models.CharField(max_length=50, default='general') # 'general' or 'review_prompt'
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.user.username} - {self.title}"
+
 from products.models import Product
 
 class Wishlist(models.Model):

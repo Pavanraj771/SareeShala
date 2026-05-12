@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Search, ShoppingBag, ArrowRight, Menu, X, Heart } from 'lucide-react';
+import { Search, ShoppingBag, ArrowRight, Menu, X, Heart, Moon, Sun } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import ProfileDropdown from '../components/ProfileDropdown';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import './Home.css';
 import { API_URL } from '../config';
 
@@ -19,6 +20,7 @@ const Home = () => {
   
   const navigate = useNavigate();
   const { user, showMessage } = useAuth();
+  const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -52,16 +54,16 @@ const Home = () => {
       })
       .catch(console.error);
 
-      // Fetch Orders to derive Notification Count
-      fetch(`${API_URL}/api/orders/my-orders/`, {
+      // Fetch Notifications for Count
+      fetch(`${API_URL}/api/users/notifications/`, {
         headers: { 'Authorization': `Bearer ${user.token}` }
       })
       .then(res => res.json())
-      .then(orders => {
-        const totalNotifs = 2 + (orders.length || 0); // 2 static (welcome + promo)
-        const seenCount = parseInt(localStorage.getItem('seenNotifCount') || '0', 10);
-        const unseen = Math.max(0, totalNotifs - seenCount);
-        setUnseenNotifCount(unseen);
+      .then(data => {
+        if (Array.isArray(data)) {
+          const unseen = data.filter(n => !n.is_seen).length;
+          setUnseenNotifCount(unseen);
+        }
       })
       .catch(console.error);
     }
@@ -155,7 +157,7 @@ const Home = () => {
           <span className="nav-item" onClick={() => { setMobileMenuOpen(false); navigate('/notifications'); }} style={{cursor: 'pointer', position: 'relative'}}>
             Notifications
             {unseenNotifCount > 0 && (
-              <span className="nav-badge" style={{ position: 'absolute', top: '-8px', right: '-12px', background: '#e74c3c', color: 'white', fontSize: '0.65rem', fontWeight: 'bold', padding: '2px 6px', borderRadius: '10px' }}>
+              <span className="nav-badge" style={{ position: 'absolute', top: '-8px', right: '-12px', background: '#e74c3c', color: 'white', fontSize: '0.65rem', padding: '2px 6px', borderRadius: '10px' }}>
                 {unseenNotifCount}
               </span>
             )}
@@ -187,10 +189,20 @@ const Home = () => {
           >
             {isSearchOpen ? <X size={20} /> : <Search size={20} />}
           </button>
+          
+          {/* Theme Toggle */}
+          <button 
+            className="action-btn theme-toggle-btn" 
+            onClick={toggleTheme}
+            aria-label="Toggle Theme"
+          >
+            {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+          </button>
+
           <button id="cart-nav-btn" className="action-btn" style={{ position: 'relative' }} aria-label="Cart" onClick={() => navigate('/cart')}>
             <ShoppingBag size={20} />
             {unseenCartCount > 0 && (
-              <span className="nav-badge" style={{ position: 'absolute', top: '0', right: '0', background: '#e74c3c', color: 'white', fontSize: '0.65rem', fontWeight: 'bold', padding: '2px 5px', borderRadius: '10px', transform: 'translate(25%, -25%)' }}>
+              <span className="nav-badge" style={{ position: 'absolute', top: '0', right: '0', background: '#e74c3c', color: 'white', fontSize: '0.65rem', padding: '2px 5px', borderRadius: '10px', transform: 'translate(25%, -25%)' }}>
                 {unseenCartCount}
               </span>
             )}
@@ -202,29 +214,6 @@ const Home = () => {
         </div>
       </nav>
 
-      {/* Hero Section */}
-      <section className="hero-section">
-        <div className="hero-background">
-          <img src="/hero_saree.png" alt="Elegant Saree" />
-          <div className="hero-overlay"></div>
-        </div>
-        
-        <div className="hero-content animate-fade-in delay-200">
-          <span className="hero-subtitle">The Artisan Collection</span>
-          <h1 className="hero-title">Elegance Woven<br/>in <span className="text-gradient">Tradition</span></h1>
-          <p className="hero-desc">
-            Discover our hand-picked selection of premium silk sarees, 
-            crafted by master weavers across India. Experience the true 
-            essence of royal heritage.
-          </p>
-          <button 
-            className="btn-primary" 
-            onClick={() => document.getElementById('all-collections')?.scrollIntoView({ behavior: 'smooth' })}
-          >
-            Explore Collection <ArrowRight size={18} />
-          </button>
-        </div>
-      </section>
 
       {/* New Arrivals Section */}
       <section className="collections-section" id="new">
@@ -243,6 +232,7 @@ const Home = () => {
               onClick={() => navigate(`/product/${product.id}`)} 
               style={{ cursor: 'pointer', height: '400px' }}
             >
+              <div className="new-badge">NEW</div>
               <img src={product.image1 || product.image1_url || 'https://via.placeholder.com/300x400'} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               
               <button 
@@ -253,9 +243,9 @@ const Home = () => {
                 <Heart size={20} fill={wishlist.has(product.id) ? "currentColor" : "none"} />
               </button>
 
-              <div className="collection-overlay" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.9), transparent)', height: '50%', justifyContent: 'flex-end', padding: '1.5rem' }}>
+              <div className="collection-overlay" style={{ height: '50%', justifyContent: 'flex-end', padding: '1.5rem' }}>
                 <h3 className="collection-name" style={{ fontSize: '1.4rem', marginBottom: '0.5rem' }}>{product.name}</h3>
-                <div style={{ color: 'var(--color-accent)', fontWeight: 'bold', fontSize: '1.2rem' }}>₹{product.price}</div>
+                <div style={{ color: 'var(--color-accent)', fontSize: '1.2rem' }}>₹{product.price}</div>
               </div>
             </div>
           ))}
@@ -301,9 +291,9 @@ const Home = () => {
                 <Heart size={20} fill={wishlist.has(product.id) ? "currentColor" : "none"} />
               </button>
 
-              <div className="collection-overlay" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.9), transparent)', height: '50%', justifyContent: 'flex-end', padding: '1.5rem' }}>
+              <div className="collection-overlay" style={{ height: '50%', justifyContent: 'flex-end', padding: '1.5rem' }}>
                 <h3 className="collection-name" style={{ fontSize: '1.4rem', marginBottom: '0.5rem' }}>{product.name}</h3>
-                <div style={{ color: 'var(--color-accent)', fontWeight: 'bold', fontSize: '1.2rem' }}>₹{product.price}</div>
+                <div style={{ color: 'var(--color-accent)', fontSize: '1.2rem' }}>₹{product.price}</div>
               </div>
             </div>
           ))}
@@ -337,9 +327,9 @@ const Home = () => {
                 <Heart size={20} fill={wishlist.has(product.id) ? "currentColor" : "none"} />
               </button>
 
-              <div className="collection-overlay" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.9), transparent)', height: '50%', justifyContent: 'flex-end', padding: '1.5rem' }}>
+              <div className="collection-overlay" style={{ height: '50%', justifyContent: 'flex-end', padding: '1.5rem' }}>
                 <h3 className="collection-name" style={{ fontSize: '1.4rem', marginBottom: '0.5rem' }}>{product.name}</h3>
-                <div style={{ color: 'var(--color-accent)', fontWeight: 'bold', fontSize: '1.2rem' }}>₹{product.price}</div>
+                <div style={{ color: 'var(--color-accent)', fontSize: '1.2rem' }}>₹{product.price}</div>
               </div>
             </div>
           ))}
