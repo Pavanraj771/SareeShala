@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Package, ArrowLeft, Clock } from 'lucide-react';
+import { Package, ArrowLeft, Clock, Star } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import SubmitReviewModal from '../components/SubmitReviewModal';
 import './StubPage.css';
 import { API_URL } from '../config';
 
@@ -10,6 +11,8 @@ const Orders = () => {
   const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [reviewProduct, setReviewProduct] = useState(null);
+  const [showReviewModal, setShowReviewModal] = useState(false);
 
   useEffect(() => {
     if (user && user.token) {
@@ -116,6 +119,30 @@ const Orders = () => {
                               Qty: {item.quantity} • ₹{parseFloat(item.price_at_purchase).toLocaleString()}
                             </p>
                           </div>
+                          {o.status === 'DELIVERED' && (
+                            <button 
+                              className="review-mini-btn"
+                              onClick={() => {
+                                setReviewProduct({ id: item.product_id, name: item.product_name });
+                                setShowReviewModal(true);
+                              }}
+                              style={{
+                                background: 'rgba(212,175,55,0.1)',
+                                border: '1px solid rgba(212,175,55,0.3)',
+                                color: 'var(--color-accent-primary)',
+                                padding: '6px 12px',
+                                borderRadius: '6px',
+                                fontSize: '0.8rem',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '4px',
+                                fontWeight: '500'
+                              }}
+                            >
+                              <Star size={14} fill="currentColor"/> Review
+                            </button>
+                          )}
                         </div>
                       ))}
                     </div>
@@ -127,6 +154,18 @@ const Orders = () => {
           </>
         )}
       </div>
+      {reviewProduct && (
+        <SubmitReviewModal 
+          isOpen={showReviewModal}
+          onClose={() => setShowReviewModal(false)}
+          product={reviewProduct}
+          user={user}
+          onSuccess={() => {
+            alert('Thank you for your review!');
+            // Optional: refresh orders or reviews
+          }}
+        />
+      )}
     </div>
   );
 };

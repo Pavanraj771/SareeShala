@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Search, ShoppingBag, ArrowRight, Menu, X, Heart, Moon, Sun } from 'lucide-react';
+import { Search, ShoppingBag, ArrowRight, Menu, X, Heart, Moon, Sun, MessageSquare } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import ProfileDropdown from '../components/ProfileDropdown';
+import ProductReviewsModal from '../components/ProductReviewsModal';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import './Home.css';
@@ -17,6 +18,10 @@ const Home = () => {
   const [unseenNotifCount, setUnseenNotifCount] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  
+  const [showReviews, setShowReviews] = useState(false);
+  const [selectedProductReviews, setSelectedProductReviews] = useState([]);
+  const [reviewsLoading, setReviewsLoading] = useState(false);
   
   const navigate = useNavigate();
   const { user, showMessage } = useAuth();
@@ -87,6 +92,22 @@ const Home = () => {
       setWishlist(new Set());
     }
   }, [user]);
+
+  const fetchProductReviews = async (e, productId) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setReviewsLoading(true);
+    setShowReviews(true);
+    try {
+      const res = await fetch(`${API_URL}/api/users/reviews/product/${productId}/`);
+      const data = await res.json();
+      setSelectedProductReviews(data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setReviewsLoading(false);
+    }
+  };
 
   const toggleWishlist = async (e, productId) => {
     e.preventDefault();
@@ -243,6 +264,31 @@ const Home = () => {
                 <Heart size={20} fill={wishlist.has(product.id) ? "currentColor" : "none"} />
               </button>
 
+              <button 
+                className="review-btn-card"
+                onClick={(e) => fetchProductReviews(e, product.id)}
+                aria-label="View Reviews"
+                style={{
+                  position: 'absolute',
+                  bottom: '15px',
+                  right: '15px',
+                  background: 'rgba(0,0,0,0.5)',
+                  border: '1px solid rgba(255,255,255,0.2)',
+                  color: 'white',
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  zIndex: 5,
+                  transition: 'all 0.3s ease'
+                }}
+              >
+                <MessageSquare size={18} />
+              </button>
+
               <div className="collection-overlay" style={{ height: '50%', justifyContent: 'flex-end', padding: '1.5rem' }}>
                 <h3 className="collection-name" style={{ fontSize: '1.4rem', marginBottom: '0.5rem' }}>{product.name}</h3>
                 <div style={{ color: 'var(--color-accent)', fontSize: '1.2rem' }}>₹{product.price}</div>
@@ -291,6 +337,31 @@ const Home = () => {
                 <Heart size={20} fill={wishlist.has(product.id) ? "currentColor" : "none"} />
               </button>
 
+              <button 
+                className="review-btn-card"
+                onClick={(e) => fetchProductReviews(e, product.id)}
+                aria-label="View Reviews"
+                style={{
+                  position: 'absolute',
+                  bottom: '15px',
+                  right: '15px',
+                  background: 'rgba(0,0,0,0.5)',
+                  border: '1px solid rgba(255,255,255,0.2)',
+                  color: 'white',
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  zIndex: 5,
+                  transition: 'all 0.3s ease'
+                }}
+              >
+                <MessageSquare size={18} />
+              </button>
+
               <div className="collection-overlay" style={{ height: '50%', justifyContent: 'flex-end', padding: '1.5rem' }}>
                 <h3 className="collection-name" style={{ fontSize: '1.4rem', marginBottom: '0.5rem' }}>{product.name}</h3>
                 <div style={{ color: 'var(--color-accent)', fontSize: '1.2rem' }}>₹{product.price}</div>
@@ -325,6 +396,31 @@ const Home = () => {
                 aria-label="Toggle Wishlist"
               >
                 <Heart size={20} fill={wishlist.has(product.id) ? "currentColor" : "none"} />
+              </button>
+
+              <button 
+                className="review-btn-card"
+                onClick={(e) => fetchProductReviews(e, product.id)}
+                aria-label="View Reviews"
+                style={{
+                  position: 'absolute',
+                  bottom: '15px',
+                  right: '15px',
+                  background: 'rgba(0,0,0,0.5)',
+                  border: '1px solid rgba(255,255,255,0.2)',
+                  color: 'white',
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  zIndex: 5,
+                  transition: 'all 0.3s ease'
+                }}
+              >
+                <MessageSquare size={18} />
               </button>
 
               <div className="collection-overlay" style={{ height: '50%', justifyContent: 'flex-end', padding: '1.5rem' }}>
@@ -368,6 +464,12 @@ const Home = () => {
           </div>
         </div>
       </section>
+      <ProductReviewsModal 
+        isOpen={showReviews} 
+        onClose={() => setShowReviews(false)} 
+        reviews={selectedProductReviews} 
+        loading={reviewsLoading} 
+      />
     </div>
   );
 };

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { ArrowLeft, ShoppingBag, Heart } from 'lucide-react';
+import { ArrowLeft, ShoppingBag, Heart, Star, MessageSquare } from 'lucide-react';
+import ProductReviewsModal from '../components/ProductReviewsModal';
 import { useAuth } from '../context/AuthContext';
 import './ProductDetails.css';
 import { API_URL } from '../config';
@@ -16,6 +17,9 @@ const ProductDetails = () => {
   const [mainImage, setMainImage] = useState('');
   const [error, setError] = useState('');
   const [isLiked, setIsLiked] = useState(false);
+  const [showReviews, setShowReviews] = useState(false);
+  const [reviews, setReviews] = useState([]);
+  const [reviewsLoading, setReviewsLoading] = useState(false);
 
   const isAdmin = user?.is_staff || user?.token === 'admin_token_123';
 
@@ -72,6 +76,20 @@ const ProductDetails = () => {
       if (showMessage) showMessage(data.message);
     } catch (err) {
       console.error(err);
+    }
+  };
+
+  const fetchReviews = async () => {
+    setReviewsLoading(true);
+    try {
+      const res = await axios.get(`${API_URL}/api/users/reviews/product/${id}/`);
+      setReviews(res.data);
+      setShowReviews(true);
+    } catch (err) {
+      console.error('Failed to fetch reviews', err);
+      if (showMessage) showMessage('Failed to load reviews.');
+    } finally {
+      setReviewsLoading(false);
     }
   };
 
@@ -188,7 +206,7 @@ const ProductDetails = () => {
           </div>
           
           {!isAdmin && (
-            <div className="product-actions" style={{ display: 'flex', gap: '15px', marginTop: '1rem', alignItems: 'center' }}>
+            <div className="product-actions" style={{ display: 'flex', gap: '15px', marginTop: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
               <button 
                 className={`details-like-btn ${isLiked ? 'liked' : ''}`}
                 onClick={toggleWishlist}
@@ -200,15 +218,46 @@ const ProductDetails = () => {
               <button 
                 className="btn-primary add-to-cart-btn" 
                 disabled={product.stock <= 0} 
-                style={{ margin: 0, flex: 1 }}
+                style={{ margin: 0, flex: 2 }}
                 onClick={addToCart}
               >
                 <ShoppingBag size={20} /> Add to Cart
+              </button>
+
+              <button 
+                className="btn-secondary reviews-btn" 
+                style={{ 
+                  margin: 0, 
+                  flex: 1, 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: '8px',
+                  padding: '12px 20px',
+                  borderRadius: 'var(--border-radius-md)',
+                  background: 'rgba(255,255,255,0.05)',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  color: 'var(--color-text-primary)',
+                  cursor: 'pointer',
+                  fontWeight: '500',
+                  transition: 'all 0.3s ease'
+                }}
+                onClick={fetchReviews}
+                disabled={reviewsLoading}
+              >
+                <MessageSquare size={20} /> {reviewsLoading ? 'Loading...' : 'Reviews'}
               </button>
             </div>
           )}
         </div>
       </div>
+
+      {/* Reviews Modal */}
+      <ProductReviewsModal 
+        isOpen={showReviews} 
+        onClose={() => setShowReviews(false)} 
+        reviews={reviews} 
+        loading={reviewsLoading} 
+      />
     </div>
   );
 };
