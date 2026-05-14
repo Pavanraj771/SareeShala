@@ -24,6 +24,7 @@ const ProductDetails = () => {
   const isAdmin = user?.is_staff || user?.token === 'admin_token_123';
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     const fetchProduct = async () => {
       try {
         const res = await axios.get(`${API_URL}/api/products/${id}/`);

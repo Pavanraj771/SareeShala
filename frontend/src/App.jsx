@@ -1,6 +1,7 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
+import Navbar          from './components/Navbar'
 import Home            from './pages/Home'
 import Login           from './pages/Login'
 import Signup          from './pages/Signup'
@@ -21,13 +22,16 @@ import Footer          from './components/Footer'
 import { ThemeProvider } from './context/ThemeContext'
 
 function App() {
+  const [searchQuery, setSearchQuery] = useState('');
+
   return (
     <ThemeProvider>
       <AuthProvider>
         <Router>
           <div className="app-wrapper">
+            <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
             <Routes>
-            <Route path="/"                element={<Home />} />
+            <Route path="/"                element={<Home searchQuery={searchQuery} />} />
             <Route path="/login"           element={<Login />} />
             <Route path="/signup"          element={<Signup />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
