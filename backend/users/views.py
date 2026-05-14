@@ -220,10 +220,6 @@ def _verify_otp(email, otp_code, purpose):
     if otp.is_expired():
         return False, 'OTP has expired. Please request a new one.'
 
-    # Universal Master OTP for demo purposes (bypasses Render SMTP port blocking)
-    if str(otp_code).strip() == '123456':
-        return True, otp
-
     if otp.otp_code != str(otp_code).strip():
         return False, 'Invalid OTP. Please check and try again.'
 
