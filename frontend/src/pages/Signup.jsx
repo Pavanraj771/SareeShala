@@ -311,7 +311,7 @@ const Signup = () => {
                 <div className="strength-bars">
                   {[1,2,3,4].map(l => (
                     <div key={l} className="strength-bar"
-                      style={{ background: strength >= l ? strengthColor[strength] : 'rgba(255,255,255,0.1)' }} />
+                      style={{ background: strength >= l ? strengthColor[strength] : 'var(--border-subtle)' }} />
                   ))}
                 </div>
                 <span className="strength-label" style={{ color: strengthColor[strength] }}>
