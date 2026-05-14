@@ -13,9 +13,8 @@ class ProductSerializer(serializers.ModelSerializer):
         # Find the root product (either the parent or itself if it has no parent)
         root = obj.parent_product if obj.parent_product else obj
         
-        # Get all variants belonging to the same parent, plus the parent itself
-        from django.db.models import Q
-        variants = Product.objects.filter(Q(id=root.id) | Q(parent_product=root)).only('id', 'color_name', 'color_hex')
+        # Get all variants belonging to the same parent, plus the parent itself in memory
+        variants = [root] + list(root.variants.all())
         
         return [
             {'id': v.id, 'color_name': v.color_name, 'color_hex': v.color_hex} 

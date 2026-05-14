@@ -97,19 +97,23 @@ def get_tokens(user):
 
 
 def send_welcome_email(user):
+    import threading
     from django.core.mail import send_mail
-    try:
-        subject = 'Welcome to SareeShala! ✨'
-        message = f"Hi {user.first_name or user.username},\n\nThank you for joining SareeShala! We are thrilled to have you.\n\nEnjoy an exclusive 10% off on your first purchase.\n\nHappy Shopping,\nThe SareeShala Team"
-        send_mail(
-            subject,
-            message,
-            'sareeshala@outlook.com',
-            [user.email],
-            fail_silently=True,
-        )
-    except Exception as e:
-        print(f"Failed to send welcome email: {e}")
+    def _send():
+        try:
+            subject = 'Welcome to SareeShala! ✨'
+            message = f"Hi {user.first_name or user.username},\n\nThank you for joining SareeShala! We are thrilled to have you.\n\nEnjoy an exclusive 10% off on your first purchase.\n\nHappy Shopping,\nThe SareeShala Team"
+            send_mail(
+                subject,
+                message,
+                'sareeshala@outlook.com',
+                [user.email],
+                fail_silently=True,
+            )
+        except Exception as e:
+            print(f"Failed to send welcome email: {e}")
+    
+    threading.Thread(target=_send).start()
 
 
 def _send_otp_email(email, otp_code, purpose):
@@ -182,16 +186,15 @@ def send_otp(request):
     # Generate and send OTP
     otp = OTPVerification.generate(email, purpose)
 
-    try:
-        _send_otp_email(email, otp.otp_code, purpose)
-    except Exception as e:
-        # In development with console backend, this won't fail.
-        # Log for debugging.
-        print(f"[SareeShala] Email send error: {e}")
-        return Response(
-            {'error': 'Failed to send OTP. Check email configuration.'},
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR
-        )
+    # Use a background thread so we don't timeout the HTTP request
+    import threading
+    def _send_async():
+        try:
+            _send_otp_email(email, otp.otp_code, purpose)
+        except Exception as e:
+            print(f"[SareeShala] Email send error: {e}")
+
+    threading.Thread(target=_send_async).start()
 
     return Response({'message': f'OTP sent to {email}.'}, status=status.HTTP_200_OK)
 

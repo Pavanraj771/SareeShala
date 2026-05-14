@@ -9,7 +9,11 @@ from .serializers import ProductSerializer
 
 class ProductViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
-        return Product.objects.annotate(
+        return Product.objects.select_related(
+            'parent_product'
+        ).prefetch_related(
+            'variants', 'parent_product__variants'
+        ).annotate(
             total_sales=functions.Coalesce(Sum('order_items__quantity'), 0)
         ).order_by('-created_at')
     
