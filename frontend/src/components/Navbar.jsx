@@ -27,35 +27,42 @@ const Navbar = ({ searchQuery, setSearchQuery }) => {
   }, []);
 
   useEffect(() => {
-    if (user && user.token) {
-      // Fetch Cart Count
-      fetch(`${API_URL}/api/orders/cart/`, {
-        headers: { 'Authorization': `Bearer ${user.token}` }
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.items) {
-          const count = data.items.reduce((sum, item) => sum + item.quantity, 0);
-          setCartCount(count);
-          const seenCount = parseInt(localStorage.getItem('seenCartCount') || '0', 10);
-          setUnseenCartCount(Math.max(0, count - seenCount));
-        }
-      })
-      .catch(console.error);
+    const fetchNavData = () => {
+      if (user && user.token) {
+        // Fetch Cart Count
+        fetch(`${API_URL}/api/orders/cart/`, {
+          headers: { 'Authorization': `Bearer ${user.token}` }
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.items) {
+            const count = data.items.reduce((sum, item) => sum + item.quantity, 0);
+            setCartCount(count);
+            const seenCount = parseInt(localStorage.getItem('seenCartCount') || '0', 10);
+            setUnseenCartCount(Math.max(0, count - seenCount));
+          }
+        })
+        .catch(console.error);
 
-      // Fetch Notifications for Count
-      fetch(`${API_URL}/api/users/notifications/`, {
-        headers: { 'Authorization': `Bearer ${user.token}` }
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (Array.isArray(data)) {
-          const unseen = data.filter(n => !n.is_seen).length;
-          setUnseenNotifCount(unseen);
-        }
-      })
-      .catch(console.error);
-    }
+        // Fetch Notifications for Count
+        fetch(`${API_URL}/api/users/notifications/`, {
+          headers: { 'Authorization': `Bearer ${user.token}` }
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (Array.isArray(data)) {
+            const unseen = data.filter(n => !n.is_seen).length;
+            setUnseenNotifCount(unseen);
+          }
+        })
+        .catch(console.error);
+      }
+    };
+
+    fetchNavData();
+
+    window.addEventListener('cartUpdated', fetchNavData);
+    return () => window.removeEventListener('cartUpdated', fetchNavData);
   }, [user, location.pathname]);
 
   const handleSearchChange = (e) => {
@@ -86,7 +93,7 @@ const Navbar = ({ searchQuery, setSearchQuery }) => {
 
   // Hide Navbar on specific routes. 
   // Moved this after all hooks to prevent "Rendered fewer hooks than expected" error.
-  const hiddenRoutes = ['/login', '/signup', '/forgot-password'];
+  const hiddenRoutes = ['/login', '/signup', '/forgot-password','/admin'];
   if (hiddenRoutes.includes(location.pathname)) {
     return null;
   }

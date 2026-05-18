@@ -33,6 +33,69 @@ const Orders = () => {
     }
   }, [user]);
 
+  const cancelOrder = async (orderId) => {
+    if (!window.confirm("Are you sure you want to cancel this order?")) return;
+    try {
+      const res = await fetch(`${API_URL}/api/orders/${orderId}/cancel/`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${user.token}` }
+      });
+      if (res.ok) {
+        setOrders(orders.map(o => o.id === orderId ? { ...o, status: 'CANCELLED' } : o));
+      } else {
+        const data = await res.json();
+        alert(data.error || 'Failed to cancel order');
+      }
+    } catch (e) {
+      console.error(e);
+      alert('Error cancelling order');
+    }
+  };
+
+  const renderProgressBar = (status) => {
+    if (status === 'CANCELLED') {
+      return (
+        <div style={{ color: '#ff4d4d', marginTop: '1rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{width: '8px', height: '8px', borderRadius: '50%', background: '#ff4d4d'}}/> Order Cancelled
+        </div>
+      );
+    }
+    
+    const steps = ['PROCESSING', 'SHIPPED', 'DELIVERED'];
+    let currentIndex = steps.indexOf(status);
+    if (currentIndex === -1) currentIndex = 0; // fallback
+    
+    return (
+      <div className="order-progress-container" style={{ marginTop: '1.5rem', marginBottom: '1.5rem', padding: '0 10px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', position: 'relative' }}>
+          {/* Progress Line */}
+          <div style={{ position: 'absolute', top: '12px', left: '16%', right: '16%', height: '4px', background: 'var(--border-subtle)', zIndex: 0, borderRadius: '2px' }}>
+             <div style={{ width: `${(currentIndex / 2) * 100}%`, height: '100%', background: 'var(--color-accent-primary)', transition: 'width 0.4s ease', borderRadius: '2px' }} />
+          </div>
+          
+          {/* Steps */}
+          {steps.map((step, idx) => (
+            <div key={step} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 1, width: '33.33%' }}>
+              <div style={{ 
+                width: '28px', height: '28px', borderRadius: '50%', 
+                background: idx <= currentIndex ? 'var(--color-accent-primary)' : 'var(--bg-card)',
+                border: `2px solid ${idx <= currentIndex ? 'var(--color-accent-primary)' : 'var(--border-subtle)'}`,
+                display: 'flex', justifyContent: 'center', alignItems: 'center',
+                color: idx <= currentIndex ? 'white' : 'var(--color-text-secondary)',
+                fontSize: '12px', fontWeight: 'bold', transition: 'all 0.3s ease'
+              }}>
+                {(idx < currentIndex || status === 'DELIVERED') ? '✓' : idx + 1}
+              </div>
+              <span style={{ fontSize: '0.8rem', marginTop: '6px', color: idx <= currentIndex ? 'var(--color-text-primary)' : 'var(--color-text-secondary)', fontWeight: idx <= currentIndex ? '600' : '400' }}>
+                {step.charAt(0) + step.slice(1).toLowerCase()}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
   if (!user) {
     return (
       <div className="stub-gate">
@@ -81,14 +144,14 @@ const Orders = () => {
                   <div className="order-card" key={o.id}>
                     
                     {/* Header: Order ID, Date, Status, Total */}
-                    <div className="order-header">
+                    <div className="order-header" style={{ alignItems: 'flex-start' }}>
                       <div>
                         <p className="order-id">Order #{o.id}</p>
                         <p className="order-date">
                           <Clock size={14}/> {new Date(o.created_at).toLocaleDateString(undefined, { dateStyle: 'medium' })}
                         </p>
                       </div>
-                      <div style={{ textAlign: 'right' }}>
+                      <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '8px' }}>
                         <span className="order-status" style={{ 
                           color: getStatusColor(o.status), 
                           background: `${getStatusColor(o.status)}15`, 
@@ -96,11 +159,30 @@ const Orders = () => {
                         }}>
                           {o.status}
                         </span>
-                        <p style={{ marginTop: '0.8rem', fontWeight: '500', color: 'var(--color-text-primary)' }}>
+                        
+                        {o.status !== 'CANCELLED' && o.status !== 'DELIVERED' && (
+                          <button 
+                            onClick={() => cancelOrder(o.id)}
+                            style={{
+                              background: 'transparent', border: '1px solid #ff4d4d', color: '#ff4d4d',
+                              padding: '4px 10px', borderRadius: '4px', fontSize: '0.8rem', cursor: 'pointer',
+                              transition: 'all 0.2s', marginTop: '4px'
+                            }}
+                            onMouseOver={(e) => { e.target.style.background = '#ff4d4d'; e.target.style.color = 'white'; }}
+                            onMouseOut={(e) => { e.target.style.background = 'transparent'; e.target.style.color = '#ff4d4d'; }}
+                          >
+                            Cancel Order
+                          </button>
+                        )}
+                        
+                        <p style={{ marginTop: '0.2rem', fontWeight: '500', color: 'var(--color-text-primary)' }}>
                           Total: <span style={{ color: 'var(--color-accent-primary)' }}>₹{parseFloat(o.total_amount).toLocaleString()}</span>
                         </p>
                       </div>
                     </div>
+
+                    {/* Progress Bar */}
+                    {renderProgressBar(o.status)}
  
                     {/* Items List */}
                     <div className="order-items-container" style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '1rem' }}>

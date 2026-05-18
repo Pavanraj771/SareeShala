@@ -89,6 +89,15 @@ def checkout_view(request):
     # Clear cart
     cart_items.delete()
     
+    # Create Notification for placed order
+    Notification.objects.create(
+        user=user,
+        title="Order Placed Successfully! 🎉",
+        message=f"Your order #{order.id} has been placed successfully and is currently processing. You can track its status in the Orders section.",
+        type='order_update',
+        order_id=order.id
+    )
+    
     return Response({'message': 'Order placed successfully!', 'order_id': order.id})
 
 @api_view(['GET'])
@@ -178,10 +187,49 @@ def admin_orders_view(request, order_id=None):
                             product_name=item.product.name
                         )
 
-            if new_status == 'CANCELLED' and reason:
-                order.admin_cancellation_reason = reason
+            if new_status == 'CANCELLED':
+                if old_status != 'CANCELLED':
+                    if reason:
+                        order.admin_cancellation_reason = reason
+                    
+                    message = f"Your order #{order.id} has been cancelled by the administrator."
+                    if order.admin_cancellation_reason:
+                        message += f" Reason: {order.admin_cancellation_reason}"
+                        
+                    Notification.objects.create(
+                        user=order.user,
+                        title="Order Cancelled ⚠️",
+                        message=message,
+                        type='order_update',
+                        order_id=order.id
+                    )
             elif new_status != 'CANCELLED':
                 order.admin_cancellation_reason = None
             order.save()
             return Response({'message': 'Status updated'})
         return Response({'error': 'Invalid status'}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def user_cancel_order_view(request, order_id):
+    try:
+        order = Order.objects.get(id=order_id, user=request.user)
+    except Order.DoesNotExist:
+        return Response({'error': 'Order not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+    if order.status in ['DELIVERED', 'CANCELLED']:
+        return Response({'error': 'Order cannot be cancelled at this stage.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+    order.status = 'CANCELLED'
+    order.save()
+    
+    # Create notification for order cancellation
+    Notification.objects.create(
+        user=request.user,
+        title="Order Cancelled 🚫",
+        message=f"Your order #{order.id} has been cancelled successfully.",
+        type='order_update',
+        order_id=order.id
+    )
+    
+    return Response({'message': 'Order cancelled successfully'})

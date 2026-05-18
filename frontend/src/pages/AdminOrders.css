@@ -1,9 +1,10 @@
 .admin-content {
-  background: #1e1e1e;
+  background: var(--color-bg-primary);
   padding: 2rem;
-  border-radius: 12px;
-  color: #fff;
+  border-radius: var(--border-radius-lg);
+  color: var(--color-text-primary);
   font-family: var(--font-sans);
+  border: 1px solid var(--border-subtle);
 }
 
 .admin-header {
@@ -11,14 +12,14 @@
 }
 
 .admin-title {
-  color: #d4af37;
+  color: var(--color-accent-primary);
   font-family: var(--font-serif);
   margin: 0;
   font-size: 1.8rem;
 }
 
 .admin-subtitle {
-  color: #aaa;
+  color: var(--color-text-secondary);
   margin: 5px 0 0 0;
   font-size: 0.95rem;
 }
@@ -31,8 +32,8 @@
 .search-box {
   display: flex;
   align-items: center;
-  background: #121212;
-  border: 1px solid #333;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--border-subtle);
   border-radius: 6px;
   padding: 8px 12px;
   width: 100%;
@@ -40,26 +41,27 @@
 }
 
 .search-box .search-icon {
-  color: #888;
+  color: var(--color-text-secondary);
   margin-right: 8px;
 }
 
 .search-box input {
   background: transparent;
   border: none;
-  color: #fff;
+  color: var(--color-text-primary);
   width: 100%;
   outline: none;
 }
 
 .search-box input::placeholder {
-  color: #888;
+  color: var(--color-text-secondary);
 }
 
 .admin-table-container {
   overflow-x: auto;
-  border-radius: 8px;
-  background: #1e1e1e;
+  border-radius: var(--border-radius-md);
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--border-subtle);
 }
 
 .admin-table {
@@ -70,14 +72,14 @@
 
 .admin-table th {
   padding: 1rem;
-  color: #aaa;
+  color: var(--color-text-secondary);
   font-weight: normal;
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid var(--border-subtle);
 }
 
 .admin-table td {
   padding: 1rem;
-  border-bottom: 1px solid #2a2a2a;
+  border-bottom: 1px solid var(--border-subtle);
 }
 
 .status-badge {

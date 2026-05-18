@@ -112,6 +112,9 @@ const ProductDetails = () => {
       });
       const data = await res.json();
       if (showMessage) showMessage(data.message);
+      
+      // Dispatch custom event to notify Navbar immediately
+      window.dispatchEvent(new Event('cartUpdated'));
     } catch (err) {
       console.error(err);
     }

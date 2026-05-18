@@ -132,28 +132,28 @@ const AdminProducts = () => {
   };
 
   return (
-    <div style={{ background: '#1e1e1e', padding: '1.5rem', borderRadius: '12px', border: '1px solid #333' }}>
+    <div className="admin-content animate-fade-in" style={{ background: 'var(--color-bg-primary)', padding: '1.5rem', borderRadius: 'var(--border-radius-lg)', border: '1px solid var(--border-subtle)' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-        <h2 style={{ color: '#d4af37', margin: 0 }}>Product Management</h2>
-        <button onClick={openAddModal} style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '8px 16px', background: 'var(--color-accent-gradient)', color: '#000', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>
+        <h2 style={{ color: 'var(--color-accent-primary)', margin: 0, fontFamily: 'var(--font-serif)' }}>Product Management</h2>
+        <button onClick={openAddModal} className="btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '5px', margin: 0, padding: '8px 16px', fontSize: '0.9rem' }}>
           <Plus size={16} /> Add Product
         </button>
       </div>
 
-      <div style={{ overflowX: 'auto' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', color: '#fff' }}>
+      <div style={{ overflowX: 'auto', background: 'var(--color-bg-secondary)', borderRadius: 'var(--border-radius-md)', padding: '1rem', border: '1px solid var(--border-subtle)' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', color: 'var(--color-text-primary)' }}>
           <thead>
-            <tr style={{ borderBottom: '1px solid #333' }}>
-              <th style={{ padding: '12px', color: '#aaa' }}>Image</th>
-              <th style={{ padding: '12px', color: '#aaa' }}>Name</th>
-              <th style={{ padding: '12px', color: '#aaa' }}>Price</th>
-              <th style={{ padding: '12px', color: '#aaa' }}>Stock</th>
-              <th style={{ padding: '12px', color: '#aaa' }}>Actions</th>
+            <tr style={{ borderBottom: '1px solid var(--border-subtle)' }}>
+              <th style={{ padding: '12px', color: 'var(--color-text-secondary)' }}>Image</th>
+              <th style={{ padding: '12px', color: 'var(--color-text-secondary)' }}>Name</th>
+              <th style={{ padding: '12px', color: 'var(--color-text-secondary)' }}>Price</th>
+              <th style={{ padding: '12px', color: 'var(--color-text-secondary)' }}>Stock</th>
+              <th style={{ padding: '12px', color: 'var(--color-text-secondary)' }}>Actions</th>
             </tr>
           </thead>
           <tbody>
             {products.map(p => (
-              <tr key={p.id} style={{ borderBottom: '1px solid #2a2a2a' }}>
+              <tr key={p.id} style={{ borderBottom: '1px solid var(--border-subtle)' }}>
                 <td style={{ padding: '12px' }}>
                   <img src={p.image1 || p.image1_url || 'https://via.placeholder.com/50'} alt={p.name} style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '6px' }} />
                 </td>
@@ -161,14 +161,48 @@ const AdminProducts = () => {
                 <td style={{ padding: '12px' }}>₹{p.price}</td>
                 <td style={{ padding: '12px' }}>{p.stock}</td>
                 <td style={{ padding: '12px' }}>
-                  <button onClick={() => openEditModal(p)} style={{ background: 'none', border: 'none', color: '#3498db', cursor: 'pointer', marginRight: '10px' }}><Edit2 size={18} /></button>
-                  <button onClick={() => handleDelete(p.id)} style={{ background: 'none', border: 'none', color: '#e74c3c', cursor: 'pointer' }}><Trash2 size={18} /></button>
+                  <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                    <button 
+                      onClick={() => openEditModal(p)} 
+                      style={{ 
+                        background: 'rgba(52, 152, 219, 0.1)', 
+                        color: '#3498db', 
+                        border: '1px solid transparent', 
+                        padding: '6px 12px', 
+                        borderRadius: '6px', 
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        fontSize: '0.85rem'
+                      }}
+                    >
+                      <Edit2 size={14} /> Edit
+                    </button>
+                    <button 
+                      onClick={() => handleDelete(p.id)} 
+                      style={{ 
+                        background: 'rgba(231, 76, 60, 0.1)', 
+                        color: '#e74c3c', 
+                        border: '1px solid transparent', 
+                        padding: '6px 12px', 
+                        borderRadius: '6px', 
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        fontSize: '0.85rem'
+                      }}
+                    >
+                      <Trash2 size={14} /> Delete
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
             {products.length === 0 && (
               <tr>
-                <td colSpan="5" style={{ padding: '20px', textAlign: 'center', color: '#888' }}>No products found. Add some!</td>
+                <td colSpan="5" style={{ padding: '20px', textAlign: 'center', color: 'var(--color-text-secondary)' }}>No products found. Add some!</td>
               </tr>
             )}
           </tbody>
@@ -177,47 +211,47 @@ const AdminProducts = () => {
 
       {showModal && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' }}>
-          <div style={{ background: '#1e1e1e', padding: '2rem', borderRadius: '12px', width: '100%', maxWidth: '600px', maxHeight: '90vh', overflowY: 'auto', border: '1px solid #333', boxShadow: '0 10px 30px rgba(0,0,0,0.5)' }}>
+          <div style={{ background: 'var(--color-bg-secondary)', padding: '2rem', borderRadius: 'var(--border-radius-lg)', width: '100%', maxWidth: '600px', maxHeight: '90vh', overflowY: 'auto', border: '1px solid var(--border-subtle)', boxShadow: '0 10px 30px rgba(0,0,0,0.5)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-              <h3 style={{ margin: 0, color: '#fff' }}>{editId ? 'Edit Product' : 'Add New Product'}</h3>
-              <button onClick={() => setShowModal(false)} style={{ background: 'none', border: 'none', color: '#aaa', cursor: 'pointer' }}><X size={20} /></button>
+              <h3 style={{ margin: 0, color: 'var(--color-text-primary)' }}>{editId ? 'Edit Product' : 'Add New Product'}</h3>
+              <button onClick={() => setShowModal(false)} style={{ background: 'none', border: 'none', color: 'var(--color-text-secondary)', cursor: 'pointer' }}><X size={20} /></button>
             </div>
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <div>
-                <label style={{ display: 'block', marginBottom: '5px', color: '#ccc', fontSize: '0.85rem' }}>Name</label>
-                <input required name="name" value={formData.name} onChange={handleInputChange} style={{ width: '100%', padding: '10px', background: '#121212', border: '1px solid #333', borderRadius: '6px', color: '#fff' }} />
+                <label style={{ display: 'block', marginBottom: '5px', color: 'var(--color-text-secondary)', fontSize: '0.85rem' }}>Name</label>
+                <input required name="name" value={formData.name} onChange={handleInputChange} style={{ width: '100%', padding: '10px', background: 'var(--color-bg-primary)', border: '1px solid var(--border-subtle)', borderRadius: '6px', color: 'var(--color-text-primary)' }} />
               </div>
               <div>
-                <label style={{ display: 'block', marginBottom: '5px', color: '#ccc', fontSize: '0.85rem' }}>Description</label>
-                <textarea required name="description" value={formData.description} onChange={handleInputChange} style={{ width: '100%', padding: '10px', background: '#121212', border: '1px solid #333', borderRadius: '6px', color: '#fff', minHeight: '80px' }} />
+                <label style={{ display: 'block', marginBottom: '5px', color: 'var(--color-text-secondary)', fontSize: '0.85rem' }}>Description</label>
+                <textarea required name="description" value={formData.description} onChange={handleInputChange} style={{ width: '100%', padding: '10px', background: 'var(--color-bg-primary)', border: '1px solid var(--border-subtle)', borderRadius: '6px', color: 'var(--color-text-primary)', minHeight: '80px' }} />
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '5px', color: '#ccc', fontSize: '0.85rem' }}>Price (₹)</label>
-                  <input required type="number" step="0.01" name="price" value={formData.price} onChange={handleInputChange} style={{ width: '100%', padding: '10px', background: '#121212', border: '1px solid #333', borderRadius: '6px', color: '#fff' }} />
+                  <label style={{ display: 'block', marginBottom: '5px', color: 'var(--color-text-secondary)', fontSize: '0.85rem' }}>Price (₹)</label>
+                  <input required type="number" step="0.01" name="price" value={formData.price} onChange={handleInputChange} style={{ width: '100%', padding: '10px', background: 'var(--color-bg-primary)', border: '1px solid var(--border-subtle)', borderRadius: '6px', color: 'var(--color-text-primary)' }} />
                 </div>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '5px', color: '#ccc', fontSize: '0.85rem' }}>Stock</label>
-                  <input required type="number" name="stock" value={formData.stock} onChange={handleInputChange} style={{ width: '100%', padding: '10px', background: '#121212', border: '1px solid #333', borderRadius: '6px', color: '#fff' }} />
+                  <label style={{ display: 'block', marginBottom: '5px', color: 'var(--color-text-secondary)', fontSize: '0.85rem' }}>Stock</label>
+                  <input required type="number" name="stock" value={formData.stock} onChange={handleInputChange} style={{ width: '100%', padding: '10px', background: 'var(--color-bg-primary)', border: '1px solid var(--border-subtle)', borderRadius: '6px', color: 'var(--color-text-primary)' }} />
                 </div>
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '5px', color: '#ccc', fontSize: '0.85rem' }}>Color Name (e.g. Ruby Red)</label>
-                  <input name="color_name" value={formData.color_name} onChange={handleInputChange} placeholder="Ruby Red" style={{ width: '100%', padding: '10px', background: '#121212', border: '1px solid #333', borderRadius: '6px', color: '#fff' }} />
+                  <label style={{ display: 'block', marginBottom: '5px', color: 'var(--color-text-secondary)', fontSize: '0.85rem' }}>Color Name (e.g. Ruby Red)</label>
+                  <input name="color_name" value={formData.color_name} onChange={handleInputChange} placeholder="Ruby Red" style={{ width: '100%', padding: '10px', background: 'var(--color-bg-primary)', border: '1px solid var(--border-subtle)', borderRadius: '6px', color: 'var(--color-text-primary)' }} />
                 </div>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '5px', color: '#ccc', fontSize: '0.85rem' }}>Color Hex (for UI circles)</label>
+                  <label style={{ display: 'block', marginBottom: '5px', color: 'var(--color-text-secondary)', fontSize: '0.85rem' }}>Color Hex (for UI circles)</label>
                   <div style={{ display: 'flex', gap: '10px' }}>
                     <input type="color" name="color_hex" value={formData.color_hex} onChange={handleInputChange} style={{ width: '40px', height: '40px', padding: '0', background: 'none', border: 'none', cursor: 'pointer' }} />
-                    <input name="color_hex" value={formData.color_hex} onChange={handleInputChange} placeholder="#FF0000" style={{ flex: 1, padding: '10px', background: '#121212', border: '1px solid #333', borderRadius: '6px', color: '#fff' }} />
+                    <input name="color_hex" value={formData.color_hex} onChange={handleInputChange} placeholder="#FF0000" style={{ flex: 1, padding: '10px', background: 'var(--color-bg-primary)', border: '1px solid var(--border-subtle)', borderRadius: '6px', color: 'var(--color-text-primary)' }} />
                   </div>
                 </div>
               </div>
 
               <div style={{ position: 'relative' }}>
-                <label style={{ display: 'block', marginBottom: '5px', color: '#ccc', fontSize: '0.85rem' }}>Parent Product (Link as Variant)</label>
+                <label style={{ display: 'block', marginBottom: '5px', color: 'var(--color-text-secondary)', fontSize: '0.85rem' }}>Parent Product (Link as Variant)</label>
                 <div style={{ position: 'relative' }}>
                   <input 
                     type="text" 
@@ -229,13 +263,15 @@ const AdminProducts = () => {
                       if (!e.target.value) setFormData({...formData, parent_product: ''});
                     }}
                     onFocus={() => setShowParentDropdown(true)}
-                    style={{ width: '100%', padding: '10px', background: '#121212', border: '1px solid #333', borderRadius: '6px', color: '#fff' }}
+                    style={{ width: '100%', padding: '10px', background: 'var(--color-bg-primary)', border: '1px solid var(--border-subtle)', borderRadius: '6px', color: 'var(--color-text-primary)' }}
                   />
                   {showParentDropdown && (
-                    <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: '#1a1a1a', border: '1px solid #333', borderRadius: '6px', marginTop: '5px', zIndex: 100, maxHeight: '200px', overflowY: 'auto', boxShadow: '0 5px 15px rgba(0,0,0,0.5)' }}>
+                    <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: 'var(--color-bg-secondary)', border: '1px solid var(--border-subtle)', borderRadius: 'var(--border-radius-md)', marginTop: '5px', zIndex: 100, maxHeight: '200px', overflowY: 'auto', boxShadow: '0 10px 30px rgba(0,0,0,0.5)' }}>
                       <div 
                         onClick={() => { setFormData({...formData, parent_product: ''}); setParentSearchTerm(''); setShowParentDropdown(false); }}
-                        style={{ padding: '10px', cursor: 'pointer', borderBottom: '1px solid #222', color: '#aaa', fontSize: '0.85rem' }}
+                        style={{ padding: '12px 15px', cursor: 'pointer', borderBottom: '1px solid var(--border-subtle)', color: 'var(--color-text-secondary)', fontSize: '0.85rem', transition: 'background 0.2s' }}
+                        onMouseOver={(e) => e.currentTarget.style.background = 'var(--color-bg-primary)'}
+                        onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
                       >
                         None (This is a main product)
                       </div>
@@ -250,10 +286,12 @@ const AdminProducts = () => {
                               setParentSearchTerm(p.name);
                               setShowParentDropdown(false);
                             }}
-                            style={{ padding: '10px', cursor: 'pointer', borderBottom: '1px solid #222', display: 'flex', justifyContent: 'space-between' }}
+                            style={{ padding: '12px 15px', cursor: 'pointer', borderBottom: '1px solid var(--border-subtle)', display: 'flex', justifyContent: 'space-between', color: 'var(--color-text-primary)', transition: 'background 0.2s' }}
+                            onMouseOver={(e) => e.currentTarget.style.background = 'var(--color-bg-primary)'}
+                            onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
                           >
                             <span>{p.name}</span>
-                            <span style={{ color: '#666', fontSize: '0.75rem' }}>ID: {p.id}</span>
+                            <span style={{ color: 'var(--color-text-secondary)', fontSize: '0.75rem' }}>ID: {p.id}</span>
                           </div>
                         ))
                       }
@@ -264,38 +302,38 @@ const AdminProducts = () => {
               </div>
 
               <div>
-                <label style={{ display: 'block', marginBottom: '10px', color: '#ccc', fontSize: '0.85rem', fontWeight: 'bold' }}>Product Images (Choose File OR provide URL)</label>
+                <label style={{ display: 'block', marginBottom: '10px', color: 'var(--color-text-secondary)', fontSize: '0.85rem', fontWeight: 'bold' }}>Product Images (Choose File OR provide URL)</label>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
                   {[1, 2, 3, 4, 5].map(num => (
-                    <div key={num} style={{ marginBottom: '15px', padding: '10px', background: '#1a1a1a', borderRadius: '8px', border: '1px solid #333' }}>
-                      <p style={{ margin: '0 0 8px 0', fontSize: '0.75rem', color: '#d4af37' }}>Image {num}</p>
+                    <div key={num} style={{ marginBottom: '15px', padding: '10px', background: 'var(--color-bg-primary)', borderRadius: '8px', border: '1px solid var(--border-subtle)' }}>
+                      <p style={{ margin: '0 0 8px 0', fontSize: '0.75rem', color: 'var(--color-accent-primary)' }}>Image {num}</p>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                         <input 
                           type="file" 
                           accept="image/*" 
                           onChange={(e) => handleFileChange(e, `image${num}`)} 
-                          style={{ width: '100%', padding: '5px', background: '#121212', border: '1px solid #333', borderRadius: '6px', color: '#fff', fontSize: '0.75rem' }} 
+                          style={{ width: '100%', padding: '5px', background: 'var(--color-bg-secondary)', border: '1px solid var(--border-subtle)', borderRadius: '6px', color: 'var(--color-text-primary)', fontSize: '0.75rem' }} 
                         />
                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                          <span style={{ fontSize: '0.7rem', color: '#666' }}>OR</span>
+                          <span style={{ fontSize: '0.7rem', color: 'var(--color-text-secondary)' }}>OR</span>
                           <input 
                             type="text" 
                             name={`image${num}_url`} 
                             placeholder="Image URL" 
                             value={formData[`image${num}_url`]} 
                             onChange={handleInputChange} 
-                            style={{ flex: 1, padding: '8px', background: '#121212', border: '1px solid #333', borderRadius: '6px', color: '#fff', fontSize: '0.8rem' }} 
+                            style={{ flex: 1, padding: '8px', background: 'var(--color-bg-secondary)', border: '1px solid var(--border-subtle)', borderRadius: '6px', color: 'var(--color-text-primary)', fontSize: '0.8rem' }} 
                           />
                         </div>
                       </div>
                     </div>
                   ))}
                 </div>
-                {editId && <p style={{ fontSize: '0.75rem', color: '#888', marginTop: '10px' }}>* Uploading a new file or updating a URL will replace the current image in that slot.</p>}
+                {editId && <p style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)', marginTop: '10px' }}>* Uploading a new file or updating a URL will replace the current image in that slot.</p>}
               </div>
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '1rem' }}>
-                <button type="button" onClick={() => setShowModal(false)} style={{ padding: '10px 16px', background: 'transparent', color: '#fff', border: '1px solid #555', borderRadius: '6px', cursor: 'pointer' }}>Cancel</button>
-                <button type="submit" style={{ padding: '10px 16px', background: 'var(--color-accent-gradient)', color: '#000', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>{editId ? 'Save Changes' : 'Add Product'}</button>
+                <button type="button" onClick={() => setShowModal(false)} style={{ padding: '8px 16px', background: 'transparent', color: 'var(--color-text-primary)', border: '1px solid var(--border-subtle)', borderRadius: '6px', cursor: 'pointer' }}>Cancel</button>
+                <button type="submit" className="btn-primary" style={{ padding: '8px 16px', margin: 0 }}>{editId ? 'Save Changes' : 'Add Product'}</button>
               </div>
             </form>
           </div>
