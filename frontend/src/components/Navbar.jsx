@@ -20,12 +20,6 @@ const Navbar = ({ searchQuery, setSearchQuery }) => {
   const { user } = useAuth();
   const { theme, toggleTheme } = useTheme();
 
-  // Hide Navbar on specific routes
-  const hiddenRoutes = ['/login', '/signup', '/forgot-password'];
-  if (hiddenRoutes.includes(location.pathname)) {
-    return null;
-  }
-
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener('scroll', handleScroll);
@@ -89,6 +83,13 @@ const Navbar = ({ searchQuery, setSearchQuery }) => {
       navigate(path);
     }
   };
+
+  // Hide Navbar on specific routes. 
+  // Moved this after all hooks to prevent "Rendered fewer hooks than expected" error.
+  const hiddenRoutes = ['/login', '/signup', '/forgot-password'];
+  if (hiddenRoutes.includes(location.pathname)) {
+    return null;
+  }
 
   return (
     <nav className={`navbar ${scrolled ? 'scrolled' : ''}`}>
