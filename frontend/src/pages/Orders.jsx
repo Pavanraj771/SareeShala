@@ -16,16 +16,39 @@ const Orders = () => {
 
   useEffect(() => {
     if (user && user.token) {
+      if (user.token === 'demo_token_123') {
+        setOrders([{
+          id: 'DEMO-1001',
+          created_at: new Date().toISOString(),
+          status: 'DELIVERED',
+          total_amount: '4999',
+          items: [{
+            product_id: 1,
+            product_name: 'Kanjivaram Silk Saree',
+            quantity: 1,
+            price_at_purchase: '4999',
+            image: ''
+          }]
+        }]);
+        setLoading(false);
+        return;
+      }
+
       fetch(`${API_URL}/api/orders/my-orders/`, {
         headers: { 'Authorization': `Bearer ${user.token}` }
       })
-      .then(res => res.json())
+      .then(async res => {
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.detail || data.error || 'Failed to fetch orders');
+        return data;
+      })
       .then(data => {
-        setOrders(data);
+        setOrders(Array.isArray(data) ? data : []);
         setLoading(false);
       })
       .catch(err => {
         console.error(err);
+        setOrders([]);
         setLoading(false);
       });
     } else {
