@@ -1,16 +1,31 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Settings, ArrowLeft } from 'lucide-react';
+import { Settings, ArrowLeft, AlertTriangle, X, Loader2, ShieldAlert } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { API_URL } from '../config';
 import './StubPage.css';
 
 const Toggle = ({ on, onToggle }) => (
   <button className={`toggle ${on ? 'on' : ''}`} onClick={onToggle} aria-pressed={on} />
 );
 
+/* ── Random challenge text generator ── */
+const generateChallengeText = () => {
+  const words = [
+    'CONFIRM', 'DELETE', 'REMOVE', 'ERASE', 'PURGE',
+    'ALPHA', 'BRAVO', 'DELTA', 'ECHO', 'FOXTROT',
+    'TANGO', 'SIERRA', 'OSCAR', 'KILO', 'ZULU',
+  ];
+  const pick = () => words[Math.floor(Math.random() * words.length)];
+  const num = Math.floor(Math.random() * 900 + 100);        // 100–999
+  return `${pick()}-${pick()}-${num}`;
+};
+
 const AccountSettings = () => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
+
+  /* ── Preference toggles ── */
   const [prefs, setPrefs] = useState({
     emailNotif: true,
     whatsappAlerts: true,
@@ -20,6 +35,23 @@ const AccountSettings = () => {
     publicProfile: false,
   });
 
+  /* ── Delete account modal state ── */
+  const [deleteStep, setDeleteStep] = useState(0);       // 0 = closed, 1 = confirm, 2 = challenge
+  const [challengeText, setChallengeText] = useState('');
+  const [userInput, setUserInput] = useState('');
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
+
+  /* Generate new challenge text when step 2 opens */
+  useEffect(() => {
+    if (deleteStep === 2) {
+      setChallengeText(generateChallengeText());
+      setUserInput('');
+      setDeleteError('');
+    }
+  }, [deleteStep]);
+
+  /* ── Guard: not logged in ── */
   if (!user) {
     return (
       <div className="stub-gate">
@@ -34,6 +66,53 @@ const AccountSettings = () => {
   }
 
   const toggle = (key) => setPrefs((p) => ({ ...p, [key]: !p[key] }));
+
+  /* ── Delete account handler ── */
+  const handleDeleteAccount = async () => {
+    if (userInput !== challengeText) {
+      setDeleteError('Text does not match. Please type the exact text shown above.');
+      return;
+    }
+
+    setDeleting(true);
+    setDeleteError('');
+
+    try {
+      const res = await fetch(`${API_URL}/api/users/delete-account/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${user.token}`,
+        },
+        body: JSON.stringify({
+          confirmation_text: userInput,
+          expected_text: challengeText,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setDeleteStep(0);
+        logout();
+        navigate('/login');
+      } else {
+        setDeleteError(data.error || 'Failed to delete account. Please try again.');
+      }
+    } catch {
+      setDeleteError('Network error. Please check your connection and try again.');
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const closeModal = () => {
+    if (!deleting) {
+      setDeleteStep(0);
+      setUserInput('');
+      setDeleteError('');
+    }
+  };
 
   return (
     <div className="stub-page">
@@ -97,11 +176,90 @@ const AccountSettings = () => {
                 <p className="settings-label">Delete Account</p>
                 <p className="settings-sub">Permanently remove your account and all data</p>
               </div>
-              <button className="cancel-btn">Delete →</button>
+              <button className="cancel-btn" onClick={() => setDeleteStep(1)}>Delete →</button>
             </div>
           </div>
         </div>
       </div>
+
+      {/* ─── Delete Account Modal ─── */}
+      {deleteStep > 0 && (
+        <div className="delete-modal-overlay" onClick={closeModal}>
+          <div className="delete-modal" onClick={(e) => e.stopPropagation()}>
+
+            {/* Close button */}
+            <button className="delete-modal-close" onClick={closeModal} disabled={deleting}>
+              <X size={20} />
+            </button>
+
+            {/* Step 1: Confirm intent */}
+            {deleteStep === 1 && (
+              <div className="delete-modal-body">
+                <div className="delete-modal-icon warning">
+                  <AlertTriangle size={48} />
+                </div>
+                <h2>Are you sure?</h2>
+                <p className="delete-modal-desc">
+                  This action is <strong>irreversible</strong>. Your account, order history,
+                  wishlist, reviews, and all associated data will be permanently deleted.
+                </p>
+                <div className="delete-modal-actions">
+                  <button className="delete-modal-btn secondary" onClick={closeModal}>
+                    Cancel
+                  </button>
+                  <button className="delete-modal-btn danger" onClick={() => setDeleteStep(2)}>
+                    Yes, I want to delete
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Step 2: Challenge text */}
+            {deleteStep === 2 && (
+              <div className="delete-modal-body">
+                <div className="delete-modal-icon danger">
+                  <ShieldAlert size={48} />
+                </div>
+                <h2>Final Verification</h2>
+                <p className="delete-modal-desc">
+                  To confirm deletion, type the text below exactly as shown:
+                </p>
+                <div className="delete-challenge-text">{challengeText}</div>
+                <input
+                  id="delete-confirm-input"
+                  className="delete-challenge-input"
+                  type="text"
+                  placeholder="Type the text above..."
+                  value={userInput}
+                  onChange={(e) => { setUserInput(e.target.value); setDeleteError(''); }}
+                  disabled={deleting}
+                  autoFocus
+                  autoComplete="off"
+                  spellCheck={false}
+                />
+                {deleteError && <p className="delete-modal-error">{deleteError}</p>}
+                <div className="delete-modal-actions">
+                  <button className="delete-modal-btn secondary" onClick={() => setDeleteStep(1)} disabled={deleting}>
+                    Go Back
+                  </button>
+                  <button
+                    className="delete-modal-btn danger"
+                    onClick={handleDeleteAccount}
+                    disabled={deleting || !userInput}
+                  >
+                    {deleting ? (
+                      <><Loader2 size={16} className="spin-icon" /> Deleting...</>
+                    ) : (
+                      'Permanently Delete'
+                    )}
+                  </button>
+                </div>
+              </div>
+            )}
+
+          </div>
+        </div>
+      )}
     </div>
   );
 };

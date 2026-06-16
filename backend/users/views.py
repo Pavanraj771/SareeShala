@@ -728,3 +728,44 @@ def user_reviews(request):
         })
     return Response(data)
 
+
+# ─────────────────────────────────────────────
+#  Self-Service Account Deletion
+# ─────────────────────────────────────────────
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def delete_account(request):
+    """
+    POST /api/users/delete-account/
+    Body: { confirmation_text, expected_text }
+    Permanently deletes the authenticated user's account after verifying
+    that the confirmation text matches the expected challenge text.
+    """
+    confirmation_text = request.data.get('confirmation_text', '').strip()
+    expected_text = request.data.get('expected_text', '').strip()
+
+    if not confirmation_text or not expected_text:
+        return Response(
+            {'error': 'Confirmation text is required.'},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    if confirmation_text != expected_text:
+        return Response(
+            {'error': 'Confirmation text does not match. Account not deleted.'},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    user = request.user
+
+    # Prevent superuser / admin self-deletion through this endpoint
+    if user.is_superuser:
+        return Response(
+            {'error': 'Superuser accounts cannot be deleted via this endpoint.'},
+            status=status.HTTP_403_FORBIDDEN,
+        )
+
+    user.delete()
+    return Response({'message': 'Your account has been permanently deleted.'})
+

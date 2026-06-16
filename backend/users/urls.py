@@ -22,4 +22,7 @@ urlpatterns = [
     path('reviews/submit/', views.submit_review, name='submit-review'),
     path('reviews/product/<int:product_id>/', views.product_reviews, name='product-reviews'),
     path('reviews/my-reviews/', views.user_reviews, name='user-reviews'),
+
+    # Self-Service Account Deletion
+    path('delete-account/', views.delete_account, name='user-delete-account'),
 ]
