@@ -42,6 +42,7 @@ urlpatterns = [
 from django.conf import settings
 from django.conf.urls.static import static
 
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# Serve media files in both development and production
+# (In production, consider using S3/Cloudinary for better performance)
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
