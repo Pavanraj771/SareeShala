@@ -8,6 +8,7 @@ urlpatterns = [
     path('reset-password/', views.reset_password,   name='user-reset-password'),
     path('me/',             views.me,               name='user-me'),
     path('me/update/',      views.update_profile,   name='user-update-profile'),
+    path('toggle-order-updates/', views.toggle_order_updates, name='user-toggle-order-updates'),
     path('google/',         views.google_login,     name='user-google-login'),
     path('wishlist/',       views.wishlist_view,    name='user-wishlist'),
     

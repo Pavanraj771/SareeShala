@@ -459,6 +459,7 @@ def me(request):
         'phone_number': user.phone_number,
         'address':      user.address,
         'date_joined':  user.date_joined.strftime('%d %b %Y'),
+        'order_updates_enabled': user.order_updates_enabled,
         'stats': {
             'total_orders': Order.objects.filter(user=user).count(),
             'wishlist_count': Wishlist.objects.filter(user=user).count(),
@@ -477,6 +478,27 @@ def update_profile(request):
             setattr(user, field, request.data[field])
     user.save()
     return Response({'message': 'Profile updated successfully.'})
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def toggle_order_updates(request):
+    """
+    POST /api/users/toggle-order-updates/
+    Body: { enabled: true/false }
+    Toggles whether the user receives order-related notifications.
+    """
+    enabled = request.data.get('enabled')
+    if enabled is None:
+        return Response({'error': '"enabled" field is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    user = request.user
+    user.order_updates_enabled = bool(enabled)
+    user.save()
+    return Response({
+        'message': f'Order updates {"enabled" if user.order_updates_enabled else "disabled"} successfully.',
+        'order_updates_enabled': user.order_updates_enabled,
+    })
 
 # ─────────────────────────────────────────────
 #  Wishlist

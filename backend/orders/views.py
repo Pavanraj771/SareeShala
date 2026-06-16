@@ -89,14 +89,15 @@ def checkout_view(request):
     # Clear cart
     cart_items.delete()
     
-    # Create Notification for placed order
-    Notification.objects.create(
-        user=user,
-        title="Order Placed Successfully! 🎉",
-        message=f"Your order #{order.id} has been placed successfully and is currently processing. You can track its status in the Orders section.",
-        type='order_update',
-        order_id=order.id
-    )
+    # Create Notification for placed order (only if user has order updates enabled)
+    if user.order_updates_enabled:
+        Notification.objects.create(
+            user=user,
+            title="Order Placed Successfully! 🎉",
+            message=f"Your order #{order.id} has been placed successfully and is currently processing. You can track its status in the Orders section.",
+            type='order_update',
+            order_id=order.id
+        )
     
     return Response({'message': 'Order placed successfully!', 'order_id': order.id})
 
@@ -174,35 +175,37 @@ def admin_orders_view(request, order_id=None):
             
             # If status changed to DELIVERED, create notifications for review
             if new_status == 'DELIVERED' and old_status != 'DELIVERED':
-                order_items = order.items.all()
-                for item in order_items:
-                    if item.product:
-                        Notification.objects.create(
-                            user=order.user,
-                            title="Item Delivered! ✨",
-                            message=f"Your '{item.product.name}' has been delivered successfully. We'd love to hear your feedback!",
-                            type='review_prompt',
-                            order_id=order.id,
-                            product_id=item.product.id,
-                            product_name=item.product.name
-                        )
+                if order.user.order_updates_enabled:
+                    order_items = order.items.all()
+                    for item in order_items:
+                        if item.product:
+                            Notification.objects.create(
+                                user=order.user,
+                                title="Item Delivered! ✨",
+                                message=f"Your '{item.product.name}' has been delivered successfully. We'd love to hear your feedback!",
+                                type='review_prompt',
+                                order_id=order.id,
+                                product_id=item.product.id,
+                                product_name=item.product.name
+                            )
 
             if new_status == 'CANCELLED':
                 if old_status != 'CANCELLED':
                     if reason:
                         order.admin_cancellation_reason = reason
                     
-                    message = f"Your order #{order.id} has been cancelled by the administrator."
-                    if order.admin_cancellation_reason:
-                        message += f" Reason: {order.admin_cancellation_reason}"
-                        
-                    Notification.objects.create(
-                        user=order.user,
-                        title="Order Cancelled ⚠️",
-                        message=message,
-                        type='order_update',
-                        order_id=order.id
-                    )
+                    if order.user.order_updates_enabled:
+                        message = f"Your order #{order.id} has been cancelled by the administrator."
+                        if order.admin_cancellation_reason:
+                            message += f" Reason: {order.admin_cancellation_reason}"
+                            
+                        Notification.objects.create(
+                            user=order.user,
+                            title="Order Cancelled ⚠️",
+                            message=message,
+                            type='order_update',
+                            order_id=order.id
+                        )
             elif new_status != 'CANCELLED':
                 order.admin_cancellation_reason = None
             order.save()
@@ -223,13 +226,14 @@ def user_cancel_order_view(request, order_id):
     order.status = 'CANCELLED'
     order.save()
     
-    # Create notification for order cancellation
-    Notification.objects.create(
-        user=request.user,
-        title="Order Cancelled 🚫",
-        message=f"Your order #{order.id} has been cancelled successfully.",
-        type='order_update',
-        order_id=order.id
-    )
+    # Create notification for order cancellation (only if user has order updates enabled)
+    if request.user.order_updates_enabled:
+        Notification.objects.create(
+            user=request.user,
+            title="Order Cancelled 🚫",
+            message=f"Your order #{order.id} has been cancelled successfully.",
+            type='order_update',
+            order_id=order.id
+        )
     
     return Response({'message': 'Order cancelled successfully'})

@@ -35,6 +35,28 @@ const AccountSettings = () => {
     publicProfile: false,
   });
 
+  /* ── Fetch persisted preferences on mount ── */
+  useEffect(() => {
+    if (!user) return;
+    const fetchPrefs = async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/users/me/`, {
+          headers: { Authorization: `Bearer ${user.token}` },
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setPrefs((p) => ({
+            ...p,
+            orderUpdates: data.order_updates_enabled ?? true,
+          }));
+        }
+      } catch {
+        // Silently fail — toggle defaults to true
+      }
+    };
+    fetchPrefs();
+  }, [user]);
+
   /* ── Delete account modal state ── */
   const [deleteStep, setDeleteStep] = useState(0);       // 0 = closed, 1 = confirm, 2 = challenge
   const [challengeText, setChallengeText] = useState('');
@@ -65,7 +87,27 @@ const AccountSettings = () => {
     );
   }
 
-  const toggle = (key) => setPrefs((p) => ({ ...p, [key]: !p[key] }));
+  /* ── Toggle handler: local toggles + API call for orderUpdates ── */
+  const toggle = async (key) => {
+    const newValue = !prefs[key];
+    setPrefs((p) => ({ ...p, [key]: newValue }));
+
+    if (key === 'orderUpdates') {
+      try {
+        await fetch(`${API_URL}/api/users/toggle-order-updates/`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${user.token}`,
+          },
+          body: JSON.stringify({ enabled: newValue }),
+        });
+      } catch {
+        // Revert on failure
+        setPrefs((p) => ({ ...p, [key]: !newValue }));
+      }
+    }
+  };
 
   /* ── Delete account handler ── */
   const handleDeleteAccount = async () => {
