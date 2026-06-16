@@ -11,6 +11,7 @@ from google.auth.transport import requests as google_requests
 from django.utils.crypto import get_random_string
 import traceback
 import requests
+import os
 from .models import CustomUser, OTPVerification, Wishlist, Notification
 
 # ... (rest of imports and previous functions)
@@ -96,20 +97,46 @@ def get_tokens(user):
     }
 
 
+def _send_email_via_brevo(to_email, subject, body):
+    """Send email via Brevo HTTP API (works on Render where SMTP is blocked)."""
+    api_key = os.environ.get('BREVO_API_KEY', '')
+    if not api_key:
+        # Fallback to Django SMTP for local development
+        send_mail(
+            subject=subject,
+            message=body,
+            from_email=django_settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[to_email],
+            fail_silently=False,
+        )
+        return
+
+    response = requests.post(
+        'https://api.brevo.com/v3/smtp/email',
+        headers={
+            'accept': 'application/json',
+            'api-key': api_key,
+            'content-type': 'application/json',
+        },
+        json={
+            'sender': {'name': 'SareeShala', 'email': django_settings.EMAIL_HOST_USER},
+            'to': [{'email': to_email}],
+            'subject': subject,
+            'textContent': body,
+        },
+        timeout=10,
+    )
+    if response.status_code not in (200, 201):
+        raise Exception(f'Brevo API error ({response.status_code}): {response.text}')
+
+
 def send_welcome_email(user):
     import threading
-    from django.core.mail import send_mail
     def _send():
         try:
             subject = 'Welcome to SareeShala! ✨'
             message = f"Hi {user.first_name or user.username},\n\nThank you for joining SareeShala! We are thrilled to have you.\n\nEnjoy an exclusive 10% off on your first purchase.\n\nHappy Shopping,\nThe SareeShala Team"
-            send_mail(
-                subject,
-                message,
-                django_settings.DEFAULT_FROM_EMAIL,
-                [user.email],
-                fail_silently=True,
-            )
+            _send_email_via_brevo(user.email, subject, message)
         except Exception as e:
             print(f"Failed to send welcome email: {e}")
     
@@ -137,13 +164,7 @@ def _send_otp_email(email, otp_code, purpose):
             f"– Team SareeShala"
         )
 
-    send_mail(
-        subject=subject,
-        message=body,
-        from_email=django_settings.DEFAULT_FROM_EMAIL,
-        recipient_list=[email],
-        fail_silently=False,
-    )
+    _send_email_via_brevo(email, subject, body)
 
 
 # ─────────────────────────────────────────────
