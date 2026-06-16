@@ -192,7 +192,7 @@ def send_otp(request):
         import traceback
         traceback.print_exc()
         return Response(
-            {'error': f'Failed to send OTP email. Please try again later. ({type(e).__name__})'},
+            {'error': f'Failed to send OTP email: {type(e).__name__}: {e}'},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
 
