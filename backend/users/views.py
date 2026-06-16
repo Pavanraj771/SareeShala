@@ -106,7 +106,7 @@ def send_welcome_email(user):
             send_mail(
                 subject,
                 message,
-                'sareeshala@outlook.com',
+                django_settings.DEFAULT_FROM_EMAIL,
                 [user.email],
                 fail_silently=True,
             )
@@ -186,15 +186,15 @@ def send_otp(request):
     # Generate and send OTP
     otp = OTPVerification.generate(email, purpose)
 
-    # Use a background thread so we don't timeout the HTTP request
-    import threading
-    def _send_async():
-        try:
-            _send_otp_email(email, otp.otp_code, purpose)
-        except Exception as e:
-            print(f"[SareeShala] Email send error: {e}")
-
-    threading.Thread(target=_send_async).start()
+    try:
+        _send_otp_email(email, otp.otp_code, purpose)
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return Response(
+            {'error': f'Failed to send OTP email. Please try again later. ({type(e).__name__})'},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
 
     return Response({'message': f'OTP sent to {email}.'}, status=status.HTTP_200_OK)
 
