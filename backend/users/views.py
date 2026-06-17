@@ -650,6 +650,7 @@ def admin_user_details(request, user_id):
                 'address': user.address,
                 'is_active': user.is_active,
                 'is_staff': user.is_staff,
+                'is_deleted_by_user': user.is_deleted_by_user,
                 'date_joined': user.date_joined.strftime('%Y-%m-%d %H:%M:%S'),
             },
             'stats': {
@@ -696,6 +697,7 @@ def admin_get_users(request):
             'last_name': u.last_name,
             'is_active': u.is_active,
             'is_staff': u.is_staff,
+            'is_deleted_by_user': u.is_deleted_by_user,
             'date_joined': u.date_joined.strftime('%Y-%m-%d %H:%M:%S'),
         })
     return Response(data)
@@ -751,8 +753,9 @@ def admin_delete_user(request, user_id):
         user = CustomUser.objects.get(id=user_id)
         if user.is_superuser:
             return Response({'error': 'Cannot delete superuser.'}, status=status.HTTP_400_BAD_REQUEST)
-        user.delete()
-        return Response({'message': 'User deleted successfully.'})
+        user.is_active = False
+        user.save()
+        return Response({'message': 'User deleted (deactivated) successfully.'})
     except CustomUser.DoesNotExist:
         return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
 
@@ -809,6 +812,8 @@ def delete_account(request):
             status=status.HTTP_403_FORBIDDEN,
         )
 
-    user.delete()
+    user.is_active = False
+    user.is_deleted_by_user = True
+    user.save()
     return Response({'message': 'Your account has been permanently deleted.'})
 

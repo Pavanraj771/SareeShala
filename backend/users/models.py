@@ -8,6 +8,7 @@ class CustomUser(AbstractUser):
     phone_number = models.CharField(max_length=15, blank=True, null=True)
     address = models.TextField(blank=True, null=True)
     order_updates_enabled = models.BooleanField(default=True)
+    is_deleted_by_user = models.BooleanField(default=False)
 
     def __str__(self):
         return self.username

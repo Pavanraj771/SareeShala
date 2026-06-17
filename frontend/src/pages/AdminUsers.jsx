@@ -154,7 +154,11 @@ const AdminUsers = () => {
                 </td>
                 <td style={{ padding: '1rem', color: 'var(--color-text-secondary)' }}>{u.email}</td>
                 <td style={{ padding: '1rem' }}>
-                  {u.is_active ? (
+                  {u.is_deleted_by_user ? (
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: '#e91e63', background: 'rgba(233, 30, 99, 0.1)', padding: '4px 8px', borderRadius: '12px', fontSize: '0.85rem', fontWeight: '500' }} title="This account was deleted by user">
+                      <XCircle size={14} /> Deleted by User
+                    </span>
+                  ) : u.is_active ? (
                     <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: '#4caf50', background: 'rgba(76, 175, 80, 0.1)', padding: '4px 8px', borderRadius: '12px', fontSize: '0.85rem' }}>
                       <CheckCircle size={14} /> Active
                     </span>
@@ -349,7 +353,7 @@ const AdminUsers = () => {
                     <p style={{ margin: '5px 0' }}><strong style={{ color: 'var(--color-text-primary)'}}>Phone:</strong> {userDetails.profile.phone_number || 'N/A'}</p>
                     <p style={{ margin: '5px 0' }}><strong style={{ color: 'var(--color-text-primary)'}}>Joined:</strong> {userDetails.profile.date_joined}</p>
                     <p style={{ margin: '5px 0' }}>
-                      <strong>Status:</strong> {userDetails.profile.is_active ? <span style={{color: '#4caf50'}}>Active</span> : <span style={{color: '#f44336'}}>Blocked</span>}
+                      <strong>Status:</strong> {userDetails.profile.is_deleted_by_user ? <span style={{color: '#e91e63', fontWeight: 'bold'}}>Deleted by User</span> : userDetails.profile.is_active ? <span style={{color: '#4caf50'}}>Active</span> : <span style={{color: '#f44336'}}>Blocked</span>}
                     </p>
                   </div>
                   <div style={{ gridColumn: '1 / -1' }}>
