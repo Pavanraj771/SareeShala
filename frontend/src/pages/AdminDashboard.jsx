@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { Moon, Sun } from 'lucide-react';
@@ -11,7 +11,10 @@ const AdminDashboard = () => {
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const location = useLocation();
+  const [activeTab, setActiveTab] = useState(
+    location.state?.adminTab || 'dashboard'
+  );
 
   // Basic role check
   if (!user || user.role !== 'admin') {
@@ -96,7 +99,7 @@ const AdminDashboard = () => {
       )}
 
       {activeTab === 'products' && <AdminProducts />}
-      {activeTab === 'orders' && <AdminOrders />}
+      {activeTab === 'orders' && <AdminOrders reopenOrderId={location.state?.reopenOrderId} />}
       {activeTab === 'users' && <AdminUsers />}
     </div>
   );

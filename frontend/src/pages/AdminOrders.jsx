@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Search } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Search, ChevronRight } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import './AdminOrders.css';
 import { API_URL } from '../config';
 
-const AdminOrders = () => {
+const AdminOrders = ({ reopenOrderId }) => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -33,6 +35,16 @@ const AdminOrders = () => {
       fetchOrders();
     }
   }, [user]);
+
+  // Auto-open order modal when returning from product details
+  useEffect(() => {
+    if (reopenOrderId && orders.length > 0) {
+      const orderToOpen = orders.find(o => String(o.id) === String(reopenOrderId));
+      if (orderToOpen) {
+        setOrderModal({ open: true, order: orderToOpen });
+      }
+    }
+  }, [reopenOrderId, orders]);
 
   const updateStatus = async (orderId, newStatus, reason = null) => {
     if (newStatus === 'CANCELLED' && reason === null) {
@@ -272,13 +284,35 @@ const AdminOrders = () => {
                     <tr style={{ background: 'rgba(255,255,255,0.02)', borderBottom: '1px solid var(--border-subtle)' }}>
                       <th style={{ padding: '10px 15px', color: 'var(--color-text-secondary)', fontSize: '0.85rem' }}>Product Name</th>
                       <th style={{ padding: '10px 15px', color: 'var(--color-text-secondary)', fontSize: '0.85rem' }}>Quantity</th>
+                      <th style={{ padding: '10px 15px', color: 'var(--color-text-secondary)', fontSize: '0.85rem', width: '40px' }}></th>
                     </tr>
                   </thead>
                   <tbody>
                     {orderModal.order.items.map((item, idx) => (
-                      <tr key={idx} style={{ borderBottom: '1px solid var(--border-subtle)' }}>
+                      <tr 
+                        key={idx} 
+                        onClick={() => {
+                          if (item.product_id) {
+                            setOrderModal({ open: false, order: null });
+                            navigate(`/product/${item.product_id}`, {
+                              state: { adminTab: 'orders', reopenOrderId: orderModal.order.id }
+                            });
+                          }
+                        }}
+                        style={{ 
+                          borderBottom: '1px solid var(--border-subtle)', 
+                          cursor: item.product_id ? 'pointer' : 'default',
+                          transition: 'background 0.2s'
+                        }}
+                        onMouseOver={(e) => { if (item.product_id) e.currentTarget.style.background = 'rgba(212,175,55,0.08)'; }}
+                        onMouseOut={(e) => { e.currentTarget.style.background = 'transparent'; }}
+                        title={item.product_id ? 'Click to view saree details' : ''}
+                      >
                         <td style={{ padding: '10px 15px', color: 'var(--color-text-primary)' }}>{item.product_name}</td>
                         <td style={{ padding: '10px 15px', color: 'var(--color-text-primary)' }}>{item.quantity}</td>
+                        <td style={{ padding: '10px 8px', color: 'var(--color-text-secondary)' }}>
+                          {item.product_id && <ChevronRight size={16} />}
+                        </td>
                       </tr>
                     ))}
                   </tbody>

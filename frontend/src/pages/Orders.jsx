@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Package, ArrowLeft, Clock, Star } from 'lucide-react';
+import { Package, ArrowLeft, Clock, Star, ChevronRight } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import SubmitReviewModal from '../components/SubmitReviewModal';
 import './StubPage.css';
 import { API_URL } from '../config';
 
 const Orders = () => {
-  const { user } = useAuth();
+  const { user, showMessage } = useAuth();
   const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -164,7 +164,12 @@ const Orders = () => {
             ) : (
               <div className="orders-list">
                 {orders.map((o) => (
-                  <div className="order-card" key={o.id}>
+                  <div 
+                    className="order-card" 
+                    key={o.id}
+                    onClick={() => navigate(`/orders/${o.id}`)}
+                    style={{ cursor: 'pointer' }}
+                  >
                     
                     {/* Header: Order ID, Date, Status, Total */}
                     <div className="order-header" style={{ alignItems: 'flex-start' }}>
@@ -185,7 +190,7 @@ const Orders = () => {
                         
                         {o.status !== 'CANCELLED' && o.status !== 'DELIVERED' && (
                           <button 
-                            onClick={() => cancelOrder(o.id)}
+                            onClick={(e) => { e.stopPropagation(); cancelOrder(o.id); }}
                             style={{
                               background: 'transparent', border: '1px solid #ff4d4d', color: '#ff4d4d',
                               padding: '4px 10px', borderRadius: '4px', fontSize: '0.8rem', cursor: 'pointer',
@@ -207,27 +212,28 @@ const Orders = () => {
                     {/* Progress Bar */}
                     {renderProgressBar(o.status)}
  
-                    {/* Items List */}
-                    <div className="order-items-container" style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                      {o.items.map((item, idx) => (
-                        <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '1.2rem' }}>
-                          <div style={{ width: '50px', height: '60px', borderRadius: '8px', overflow: 'hidden', background: 'var(--border-subtle)', flexShrink: 0 }}>
+                    {/* Compact Items Preview */}
+                    <div className="order-items-container" style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+                      {o.items.slice(0, 2).map((item, idx) => (
+                        <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                          <div style={{ width: '44px', height: '54px', borderRadius: '8px', overflow: 'hidden', background: 'var(--border-subtle)', flexShrink: 0 }}>
                             {item.image ? (
                               <img src={item.image} alt="product" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                             ) : (
-                              <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', fontSize: '1.5rem'}}>🥻</div>
+                              <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', fontSize: '1.3rem'}}>🥻</div>
                             )}
                           </div>
-                          <div style={{ flex: 1 }}>
-                            <p style={{ fontSize: '1rem', color: 'var(--color-text-primary)', marginBottom: '2px' }}>{item.product_name}</p>
-                            <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.85rem' }}>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <p style={{ fontSize: '0.92rem', color: 'var(--color-text-primary)', marginBottom: '2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.product_name}</p>
+                            <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.8rem' }}>
                               Qty: {item.quantity} • ₹{parseFloat(item.price_at_purchase).toLocaleString()}
                             </p>
                           </div>
                           {o.status === 'DELIVERED' && (
                             <button 
                               className="review-mini-btn"
-                              onClick={() => {
+                              onClick={(e) => {
+                                e.stopPropagation();
                                 setReviewProduct({ id: item.product_id, name: item.product_name });
                                 setShowReviewModal(true);
                               }}
@@ -250,6 +256,21 @@ const Orders = () => {
                           )}
                         </div>
                       ))}
+                      {o.items.length > 2 && (
+                        <p style={{ fontSize: '0.82rem', color: 'var(--color-text-secondary)', textAlign: 'center', paddingTop: '4px' }}>
+                          +{o.items.length - 2} more item{o.items.length - 2 > 1 ? 's' : ''}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* View Details Indicator */}
+                    <div style={{ 
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
+                      marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--border-subtle)',
+                      color: 'var(--color-accent-primary)', fontSize: '0.85rem', fontWeight: '600',
+                      opacity: 0.7, transition: 'opacity 0.2s'
+                    }}>
+                      View Details <ChevronRight size={16} />
                     </div>
  
                   </div>
@@ -266,7 +287,7 @@ const Orders = () => {
           product={reviewProduct}
           user={user}
           onSuccess={() => {
-            alert('Thank you for your review!');
+            if (showMessage) showMessage('Thank you for your review! ✨');
             // Optional: refresh orders or reviews
           }}
         />

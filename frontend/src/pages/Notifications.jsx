@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bell, ArrowLeft, Package, Star, MessageSquare, X } from 'lucide-react';
+import { Bell, ArrowLeft, Package, Star, MessageSquare, X, ExternalLink } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import './StubPage.css';
 import { API_URL } from '../config';
 
 const Notifications = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, showMessage } = useAuth();
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showReviewModal, setShowReviewModal] = useState(false);
@@ -79,11 +79,11 @@ const Notifications = () => {
         handleMarkAsSeen(activeProduct.notifId);
         setShowReviewModal(false);
         setReviewForm({ rating: 5, comment: '' });
-        alert('Thank you for your review!');
+        if (showMessage) showMessage('Thank you for your review! ✨');
       }
     } catch (err) {
       console.error(err);
-      alert('Failed to submit review.');
+      if (showMessage) showMessage('Failed to submit review.');
     } finally {
       setSubmitting(false);
     }
@@ -152,8 +152,10 @@ const Notifications = () => {
                       </div>
                       <p style={{ margin: 0, color: 'var(--color-text-secondary)', fontSize: '0.95rem', lineHeight: '1.6' }}>{n.message}</p>
                       
-                      {n.type === 'review_prompt' && !n.is_seen && (
-                        <div style={{ marginTop: '1.2rem', display: 'flex', gap: '1rem' }}>
+                      {/* Action buttons */}
+                      <div style={{ marginTop: '1.2rem', display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center' }}>
+                        {/* Review Item button - only for unseen review_prompt notifications */}
+                        {n.type === 'review_prompt' && !n.is_seen && (
                           <button 
                             className="btn-primary" 
                             style={{ padding: '8px 20px', fontSize: '0.85rem' }}
@@ -164,23 +166,30 @@ const Notifications = () => {
                           >
                             Review Item
                           </button>
+                        )}
+
+                        {/* View Order button - always visible for any notification with an order_id */}
+                        {n.order_id && (
                           <button 
-                            style={{ background: 'none', border: '1px solid var(--border-subtle)', color: 'var(--color-text-secondary)', padding: '8px 20px', borderRadius: '50px', cursor: 'pointer', fontSize: '0.85rem' }}
+                            style={{ background: 'rgba(239, 68, 68, 0.08)', border: '1px solid rgba(239, 68, 68, 0.25)', color: 'var(--color-accent-primary)', padding: '8px 20px', borderRadius: '50px', cursor: 'pointer', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '6px', fontWeight: '500', transition: 'all 0.2s ease', fontFamily: 'var(--font-sans)' }}
+                            onClick={() => navigate(`/orders/${n.order_id}`)}
+                            onMouseOver={(e) => { e.currentTarget.style.background = 'rgba(239, 68, 68, 0.15)'; }}
+                            onMouseOut={(e) => { e.currentTarget.style.background = 'rgba(239, 68, 68, 0.08)'; }}
+                          >
+                            <ExternalLink size={14} /> View Order
+                          </button>
+                        )}
+
+                        {/* Mark Read button - only for unseen notifications */}
+                        {!n.is_seen && (
+                          <button 
+                            style={{ background: 'none', border: '1px solid var(--border-subtle)', color: 'var(--color-text-secondary)', padding: '8px 20px', borderRadius: '50px', cursor: 'pointer', fontSize: '0.85rem', fontFamily: 'var(--font-sans)' }}
                             onClick={() => handleMarkAsSeen(n.id)}
                           >
                             Mark Read
                           </button>
-                        </div>
-                      )}
-
-                      {!n.is_seen && n.type !== 'review_prompt' && (
-                        <button 
-                          style={{ marginTop: '1rem', background: 'none', border: 'none', color: 'var(--color-accent-primary)', cursor: 'pointer', fontSize: '0.85rem', padding: 0 }}
-                          onClick={() => handleMarkAsSeen(n.id)}
-                        >
-                          Mark as Read
-                        </button>
-                      )}
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>

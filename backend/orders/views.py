@@ -110,6 +110,7 @@ def my_orders_view(request):
         items_data = []
         for item in order.items.all():
             items_data.append({
+                'product_id': item.product.id if item.product else None,
                 'product_name': item.product.name if item.product else 'Unknown Product',
                 'image': request.build_absolute_uri(item.product.image1.url) if item.product and item.product.image1 else (item.product.image1_url if item.product else None),
                 'quantity': item.quantity,
@@ -147,6 +148,7 @@ def admin_orders_view(request, order_id=None):
             items_data = []
             for item in order.items.all():
                 items_data.append({
+                    'product_id': item.product.id if item.product else None,
                     'product_name': item.product.name if item.product else 'Unknown',
                     'quantity': item.quantity,
                 })

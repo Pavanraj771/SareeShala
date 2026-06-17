@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { ArrowLeft, ShoppingBag, Heart, Star, MessageSquare } from 'lucide-react';
 import ProductReviewsModal from '../components/ProductReviewsModal';
@@ -10,6 +10,7 @@ import { API_URL } from '../config';
 const ProductDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, showMessage } = useAuth();
   
   const [product, setProduct] = useState(null);
@@ -134,7 +135,13 @@ const ProductDetails = () => {
 
   return (
     <div className="product-details-container animate-fade-in">
-      <button className="back-btn" onClick={() => navigate(-1)}>
+      <button className="back-btn" onClick={() => {
+        if (location.state?.adminTab) {
+          navigate('/admin', { state: { adminTab: location.state.adminTab, reopenOrderId: location.state.reopenOrderId } });
+        } else {
+          navigate(-1);
+        }
+      }}>
         <ArrowLeft size={20} /> Back
       </button>
 
