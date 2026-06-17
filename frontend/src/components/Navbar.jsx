@@ -94,7 +94,7 @@ const Navbar = ({ searchQuery, setSearchQuery }) => {
   // Hide Navbar on specific routes. 
   // Moved this after all hooks to prevent "Rendered fewer hooks than expected" error.
   const hiddenRoutes = ['/login', '/signup', '/forgot-password','/admin'];
-  if (hiddenRoutes.includes(location.pathname)) {
+  if (hiddenRoutes.includes(location.pathname) || location.state?.adminTab) {
     return null;
   }
 

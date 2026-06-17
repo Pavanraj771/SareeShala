@@ -8,7 +8,7 @@ const Footer = () => {
   const hideFooterPaths = ['/login', '/signup', '/forgot-password', '/admin'];
 
   // Don't show footer on auth pages or any admin pages
-  if (hideFooterPaths.includes(location.pathname) || location.pathname.startsWith('/admin')) {
+  if (hideFooterPaths.includes(location.pathname) || location.pathname.startsWith('/admin') || location.state?.adminTab) {
     return null;
   }
 

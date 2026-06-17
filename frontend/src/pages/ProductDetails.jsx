@@ -22,7 +22,26 @@ const ProductDetails = () => {
   const [reviews, setReviews] = useState([]);
   const [reviewsLoading, setReviewsLoading] = useState(false);
 
+  const [analytics, setAnalytics] = useState(null);
+  const [analyticsLoading, setAnalyticsLoading] = useState(false);
+
   const isAdmin = user?.is_staff || user?.token === 'admin_token_123';
+
+  useEffect(() => {
+    if (location.state?.adminTab) {
+      setAnalyticsLoading(true);
+      axios.get(`${API_URL}/api/products/${id}/analytics/`)
+        .then(res => {
+          setAnalytics(res.data);
+        })
+        .catch(err => {
+          console.error("Failed to fetch analytics:", err);
+        })
+        .finally(() => {
+          setAnalyticsLoading(false);
+        });
+    }
+  }, [id, location.state?.adminTab]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -261,6 +280,153 @@ const ProductDetails = () => {
           )}
         </div>
       </div>
+
+      {/* Admin Performance Analytics */}
+      {location.state?.adminTab && (
+        <div style={{
+          marginTop: '2.5rem',
+          padding: '2rem',
+          background: 'var(--color-bg-secondary)',
+          borderRadius: 'var(--border-radius-lg)',
+          border: '1px solid var(--border-subtle)',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.15)'
+        }}>
+          <h2 style={{
+            fontSize: '1.25rem',
+            color: 'var(--color-accent-primary)',
+            fontFamily: 'var(--font-serif)',
+            marginBottom: '1.5rem',
+            borderBottom: '1px solid var(--border-subtle)',
+            paddingBottom: '0.75rem',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px'
+          }}>
+            <ShoppingBag size={20} /> Admin Performance Insights
+          </h2>
+
+          {analyticsLoading ? (
+            <p style={{ color: 'var(--color-text-secondary)' }}>Loading analytics...</p>
+          ) : analytics ? (
+            <div>
+              {/* Stats Grid */}
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                gap: '1.5rem',
+                marginBottom: '2rem'
+              }}>
+                <div style={{
+                  background: 'var(--color-bg-primary)',
+                  borderRadius: 'var(--border-radius-md)',
+                  padding: '1.5rem',
+                  border: '1px solid var(--border-subtle)',
+                  textAlign: 'center'
+                }}>
+                  <Heart size={24} style={{ color: '#e74c3c', marginBottom: '8px' }} />
+                  <p style={{ margin: 0, fontSize: '2rem', fontWeight: 'bold', color: 'var(--color-text-primary)' }}>{analytics.wishlist_count}</p>
+                  <p style={{ margin: '4px 0 0', fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>Times Wishlisted</p>
+                </div>
+
+                <div style={{
+                  background: 'var(--color-bg-primary)',
+                  borderRadius: 'var(--border-radius-md)',
+                  padding: '1.5rem',
+                  border: '1px solid var(--border-subtle)',
+                  textAlign: 'center'
+                }}>
+                  <ShoppingBag size={24} style={{ color: '#3498db', marginBottom: '8px' }} />
+                  <p style={{ margin: 0, fontSize: '2rem', fontWeight: 'bold', color: 'var(--color-text-primary)' }}>{analytics.total_ordered}</p>
+                  <p style={{ margin: '4px 0 0', fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>Units Ordered (across {analytics.total_orders} orders)</p>
+                </div>
+
+                <div style={{
+                  background: 'var(--color-bg-primary)',
+                  borderRadius: 'var(--border-radius-md)',
+                  padding: '1.5rem',
+                  border: '1px solid var(--border-subtle)',
+                  textAlign: 'center'
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'center', gap: '2px', marginBottom: '8px' }}>
+                    {[1, 2, 3, 4, 5].map(s => (
+                      <Star 
+                        key={s} 
+                        size={16} 
+                        style={{ 
+                          fill: s <= Math.round(analytics.avg_rating || 0) ? '#f39c12' : 'none', 
+                          color: s <= Math.round(analytics.avg_rating || 0) ? '#f39c12' : 'var(--color-text-secondary)' 
+                        }} 
+                      />
+                    ))}
+                  </div>
+                  <p style={{ margin: 0, fontSize: '2rem', fontWeight: 'bold', color: 'var(--color-text-primary)' }}>
+                    {analytics.avg_rating ? parseFloat(analytics.avg_rating).toFixed(1) : '0.0'}
+                  </p>
+                  <p style={{ margin: '4px 0 0', fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>Average Customer Rating ({analytics.review_count} reviews)</p>
+                </div>
+              </div>
+
+              {/* Reviews detail section */}
+              <div>
+                <h3 style={{
+                  fontSize: '1.05rem',
+                  color: 'var(--color-text-primary)',
+                  marginBottom: '1rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}>
+                  <MessageSquare size={18} style={{ color: 'var(--color-accent-primary)' }} /> Customer Feedback Reviews
+                </h3>
+
+                {analytics.reviews && analytics.reviews.length > 0 ? (
+                  <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '1rem',
+                    maxHeight: '350px',
+                    overflowY: 'auto',
+                    paddingRight: '5px'
+                  }}>
+                    {analytics.reviews.map(r => (
+                      <div key={r.id} style={{
+                        padding: '1.25rem',
+                        background: 'var(--color-bg-primary)',
+                        borderRadius: 'var(--border-radius-md)',
+                        border: '1px solid var(--border-subtle)'
+                      }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                          <strong style={{ color: 'var(--color-text-primary)' }}>{r.user}</strong>
+                          <div style={{ display: 'flex', gap: '2px' }}>
+                            {[1, 2, 3, 4, 5].map(s => (
+                              <Star 
+                                key={s} 
+                                size={14} 
+                                style={{ 
+                                  fill: s <= r.rating ? '#f39c12' : 'none', 
+                                  color: s <= r.rating ? '#f39c12' : 'var(--color-text-secondary)' 
+                                }} 
+                              />
+                            ))}
+                          </div>
+                        </div>
+                        <p style={{ margin: 0, color: 'var(--color-text-secondary)', fontSize: '0.9rem', lineHeight: '1.6' }}>{r.comment}</p>
+                        <p style={{ margin: '6px 0 0 0', fontSize: '0.75rem', color: 'var(--color-text-secondary)' }}>
+                          {new Date(r.created_at).toLocaleDateString()} at {new Date(r.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p style={{ color: 'var(--color-text-secondary)', fontStyle: 'italic', fontSize: '0.9rem' }}>No reviews have been written for this product yet.</p>
+                )}
+              </div>
+            </div>
+          ) : (
+            <p style={{ color: 'var(--color-text-secondary)' }}>Failed to load product analytics.</p>
+          )}
+        </div>
+      )}
 
       {/* Reviews Modal */}
       <ProductReviewsModal 

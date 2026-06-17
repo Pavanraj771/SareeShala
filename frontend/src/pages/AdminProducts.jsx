@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Edit2, Trash2, Plus, X } from 'lucide-react';
 import { API_URL } from '../config';
 
 const AdminProducts = () => {
+  const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -153,14 +155,19 @@ const AdminProducts = () => {
           </thead>
           <tbody>
             {products.map(p => (
-              <tr key={p.id} style={{ borderBottom: '1px solid var(--border-subtle)' }}>
+              <tr key={p.id} style={{ borderBottom: '1px solid var(--border-subtle)', cursor: 'pointer', transition: 'background 0.2s' }}
+                onClick={() => navigate(`/product/${p.id}`, { state: { adminTab: 'products' } })}
+                onMouseOver={(e) => e.currentTarget.style.background = 'rgba(212,175,55,0.05)'}
+                onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
+                title="Click to view saree details"
+              >
                 <td style={{ padding: '12px' }}>
                   <img src={p.image1 || p.image1_url || 'https://via.placeholder.com/50'} alt={p.name} style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '6px' }} />
                 </td>
                 <td style={{ padding: '12px', fontWeight: 'bold' }}>{p.name}</td>
                 <td style={{ padding: '12px' }}>₹{p.price}</td>
                 <td style={{ padding: '12px' }}>{p.stock}</td>
-                <td style={{ padding: '12px' }}>
+                <td style={{ padding: '12px' }} onClick={(e) => e.stopPropagation()}>
                   <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                     <button 
                       onClick={() => openEditModal(p)} 
