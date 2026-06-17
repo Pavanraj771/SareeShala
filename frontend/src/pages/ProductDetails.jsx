@@ -199,34 +199,55 @@ const ProductDetails = () => {
           {product.color_variants && product.color_variants.length > 1 && (
             <div className="product-variants" style={{ marginTop: '1.5rem', marginBottom: '1.5rem' }}>
               <h3 style={{ fontSize: '1rem', color: '#ccc', marginBottom: '10px' }}>Available Colors</h3>
-              <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
                 {product.color_variants.map(variant => (
                   <div 
                     key={variant.id}
-                    onClick={() => navigate(`/product/${variant.id}`)}
-                    title={variant.color_name}
+                    onClick={() => navigate(`/product/${variant.id}`, { state: location.state })}
                     style={{ 
-                      width: '35px', 
-                      height: '35px', 
-                      borderRadius: '50%', 
-                      background: variant.color_hex || '#ccc', 
-                      cursor: 'pointer',
-                      border: variant.id === parseInt(id) ? '3px solid #d4af37' : '1px solid #555',
-                      boxShadow: variant.id === parseInt(id) ? '0 0 10px rgba(212,175,55,0.5)' : 'none',
-                      transition: 'all 0.2s ease',
+                      display: 'flex', 
+                      flexDirection: 'column', 
+                      alignItems: 'center', 
+                      gap: '6px',
+                      cursor: 'pointer' 
                     }}
-                    onMouseOver={(e) => {
-                      e.currentTarget.style.transform = 'scale(1.15)';
-                      e.currentTarget.style.borderColor = '#d4af37';
-                    }}
-                    onMouseOut={(e) => {
-                      e.currentTarget.style.transform = 'scale(1)';
-                      if (variant.id !== parseInt(id)) e.currentTarget.style.borderColor = '#555';
-                    }}
-                  />
+                  >
+                    <div 
+                      title={variant.color_name}
+                      style={{ 
+                        width: '35px', 
+                        height: '35px', 
+                        borderRadius: '50%', 
+                        background: variant.color_hex || '#ccc', 
+                        border: variant.id === parseInt(id) ? '3px solid #d4af37' : '1px solid #555',
+                        boxShadow: variant.id === parseInt(id) ? '0 0 10px rgba(212,175,55,0.5)' : 'none',
+                        transition: 'all 0.2s ease',
+                      }}
+                      onMouseOver={(e) => {
+                        e.currentTarget.style.transform = 'scale(1.15)';
+                        e.currentTarget.style.borderColor = '#d4af37';
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.transform = 'scale(1)';
+                        if (variant.id !== parseInt(id)) e.currentTarget.style.borderColor = '#555';
+                      }}
+                    />
+                    <span style={{ 
+                      fontSize: '0.75rem', 
+                      color: variant.id === parseInt(id) ? '#d4af37' : '#aaa', 
+                      fontWeight: variant.id === parseInt(id) ? 'bold' : 'normal',
+                      textAlign: 'center',
+                      maxWidth: '80px',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap'
+                    }}>
+                      {variant.color_name || 'Unnamed'}
+                    </span>
+                  </div>
                 ))}
               </div>
-              {product.color_name && <p style={{ fontSize: '0.8rem', color: '#888', marginTop: '8px' }}>Selected: <strong>{product.color_name}</strong></p>}
+              {product.color_name && <p style={{ fontSize: '0.8rem', color: '#888', marginTop: '12px' }}>Selected: <strong>{product.color_name}</strong></p>}
             </div>
           )}
 
