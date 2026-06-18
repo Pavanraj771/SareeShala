@@ -19,6 +19,7 @@ import FAQ             from './pages/FAQ'
 import Checkout        from './pages/Checkout'
 import Notifications   from './pages/Notifications'
 import Footer          from './components/Footer'
+import ScrollToTop     from './components/ScrollToTop'
 
 import { ThemeProvider } from './context/ThemeContext'
 
@@ -29,6 +30,7 @@ function App() {
     <ThemeProvider>
       <AuthProvider>
         <Router>
+          <ScrollToTop />
           <div className="app-wrapper">
             <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
             <Routes>

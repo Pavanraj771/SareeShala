@@ -7,10 +7,7 @@ const faqs = [
     question: "What is SareeShala?",
     answer: "SareeShala is a premium online destination dedicated to bringing you authentic, handcrafted sarees directly from master weavers across India. We specialize in preserving traditional handloom heritage while ensuring fair compensation for artisans."
   },
-  {
-    question: "Are your sarees authentic handlooms?",
-    answer: "Yes, 100%. We work directly with weaver clusters in Kanchipuram, Banaras, Chanderi, and other traditional hubs. Every handloom saree comes with a certificate of authenticity."
-  },
+  
   {
     question: "How do I know if a saree is pure silk?",
     answer: "All our pure silk sarees come with a Silk Mark certification, which is a government-recognized label assuring the purity of the silk used in the product."
@@ -21,7 +18,7 @@ const faqs = [
   },
   {
     question: "How long does shipping take?",
-    answer: "Standard delivery within India takes 3-7 business days. For remote locations, it may take up to 10 days. Once your order is dispatched, you will receive a tracking link via email."
+    answer: "Standard delivery within India takes 2-3 business days. For remote locations, it may take up to 10 days. Once your order is dispatched, you will receive a tracking link via email."
   },
   {
     question: "What is your return and exchange policy?",
@@ -35,14 +32,7 @@ const faqs = [
     question: "What payment methods do you accept?",
     answer: "We accept all major Credit and Debit Cards, UPI (Google Pay, PhonePe, Paytm), Net Banking, and select digital wallets. Cash on Delivery (COD) is available for select pin codes."
   },
-  {
-    question: "Is it safe to use my credit card on your site?",
-    answer: "Absolutely. Our payment gateways use industry-standard 256-bit encryption technology to protect your card information. We do not store any of your credit card details on our servers."
-  },
-  {
-    question: "Do you provide a blouse piece with the saree?",
-    answer: "Most of our sarees come with an unstitched matching blouse piece attached to the saree. The product details page will explicitly mention whether a blouse piece is included and its length (usually 80cm to 1 meter)."
-  },
+  
   {
     question: "How should I care for my silk sarees?",
     answer: "We highly recommend dry cleaning only for pure silk and zari sarees to maintain their luster. Store them wrapped in a soft cotton cloth or muslin in a cool, dry place. Avoid spraying perfume directly on the saree."
@@ -53,7 +43,7 @@ const faqs = [
   },
   {
     question: "What if I receive a defective product?",
-    answer: "Quality is our top priority, but in the rare event of a defect, please contact our support team at sareeshala@gmail.com within 48 hours of delivery with photos of the defect. We will arrange a free replacement or full refund."
+    answer: "Quality is our top priority, but in the rare event of a defect, please contact our support team at sareeshala@gmail.com or mobile:9676230799 within 48 hours of delivery with photos of the defect. We will arrange some refund or replacement."
   },
   {
     question: "Do you offer bulk discounts for weddings or wholesale pricing?",
@@ -61,7 +51,7 @@ const faqs = [
   },
   {
     question: "How can I contact customer support?",
-    answer: "You can reach us via email at sareeshala@gmail.com or call us at +91 6302562375. Our support team is available Monday to Saturday, from 10:00 AM to 6:00 PM IST."
+    answer: "You can reach us via email at sareeshala@gmail.com or call us at +91 967623799. Our support team is available Monday to Saturday, from 10:00 AM to 6:00 PM IST."
   }
 ];
 

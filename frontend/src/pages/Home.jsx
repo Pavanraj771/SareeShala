@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Search, ShoppingBag, ArrowRight, Menu, X, Heart, Moon, Sun, MessageSquare } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import ProfileDropdown from '../components/ProfileDropdown';
 import ProductReviewsModal from '../components/ProductReviewsModal';
 import { useAuth } from '../context/AuthContext';
@@ -19,8 +19,21 @@ const Home = ({ searchQuery }) => {
   const [reviewsLoading, setReviewsLoading] = useState(false);
   
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, showMessage } = useAuth();
   const { theme, toggleTheme } = useTheme();
+
+  useEffect(() => {
+    if (location.hash) {
+      const element = document.querySelector(location.hash);
+      if (element) {
+        const timer = setTimeout(() => {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }, 150);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [location.hash, products.length]);
 
   useEffect(() => {
     const fetchProducts = async () => {
