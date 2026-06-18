@@ -99,7 +99,7 @@ const Navbar = ({ searchQuery, setSearchQuery }) => {
   }
 
   return (
-    <nav className={`navbar ${scrolled ? 'scrolled' : ''}`}>
+    <nav className={`navbar ${scrolled ? 'scrolled' : ''} ${isSearchOpen ? 'search-active' : ''}`}>
       <div 
         className="logo text-gradient" 
         onClick={() => { window.scrollTo({ top: 0, behavior: 'smooth' }); navigate('/'); }}

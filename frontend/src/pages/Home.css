@@ -350,8 +350,12 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
-  .navbar {
-    padding: 15px 5%;
+  .navbar,
+  .navbar.scrolled {
+    padding: 12px 20px;
+    width: 94%;
+    justify-content: flex-start;
+    gap: 1.2rem;
   }
 
   .logo {
@@ -409,12 +413,23 @@
 }
 
 @media (max-width: 480px) {
+  .navbar,
+  .navbar.scrolled {
+    padding: 12px 12px;
+    gap: 0.8rem;
+  }
+
   .logo {
-    font-size: 1.2rem;
+    font-size: 1.15rem;
+    letter-spacing: 1px;
+  }
+  
+  .navbar.search-active .logo {
+    display: none;
   }
   
   .nav-actions {
-    gap: 0.8rem;
+    gap: 0.6rem;
   }
 
   .hero-title {
