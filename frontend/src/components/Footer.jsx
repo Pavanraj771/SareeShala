@@ -33,7 +33,10 @@ const Footer = () => {
     <footer className="global-footer">
       <div className="footer-container">
         <div className="footer-section brand-section">
-          <h2 className="footer-logo text-gradient">SAREESHALA</h2>
+          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
+            <img src="/logo.png" alt="SareeShala Logo" style={{ height: '40px', width: 'auto', borderRadius: '50%' }} />
+            <h2 className="footer-logo" style={{ marginBottom: 0, marginLeft: '12px' }}>SAREESHALA</h2>
+          </div>
           <p className="footer-desc">
             Elegance woven in tradition. Discover the finest handloom sarees crafted by master weavers from across India.
           </p>

@@ -66,11 +66,19 @@ def checkout_view(request):
         
     total_amount = sum(item.product.price * item.quantity for item in cart_items)
     
+    # Extract shipping details from request
+    shipping_address = request.data.get('shipping_address', '')
+    shipping_phone = request.data.get('shipping_phone', '')
+    shipping_pincode = request.data.get('shipping_pincode', '')
+    
     # Create Order
     order = Order.objects.create(
         user=user,
         total_amount=total_amount,
-        status='PROCESSING'
+        status='PROCESSING',
+        shipping_address=shipping_address,
+        shipping_phone=shipping_phone,
+        shipping_pincode=shipping_pincode
     )
     
     # Create OrderItems
@@ -159,6 +167,9 @@ def admin_orders_view(request, order_id=None):
                 'total_amount': str(order.total_amount),
                 'created_at': order.created_at,
                 'admin_cancellation_reason': order.admin_cancellation_reason,
+                'shipping_address': order.shipping_address or '',
+                'shipping_phone': order.shipping_phone or '',
+                'shipping_pincode': order.shipping_pincode or '',
                 'items': items_data
             })
         return Response(data)

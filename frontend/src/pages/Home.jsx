@@ -231,7 +231,7 @@ const Home = ({ searchQuery }) => {
           </div>
           
           {displayProducts.length > 0 ? (
-            <div className="collections-grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '2rem' }}>
+            <div className="collections-grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))', gap: '2rem' }}>
               {displayProducts.map(product => (
                 <ProductCard key={`search-${product.id}`} product={product} />
               ))}
@@ -254,7 +254,7 @@ const Home = ({ searchQuery }) => {
               </p>
             </div>
 
-            <div className="collections-grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '2rem' }}>
+            <div className="collections-grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))', gap: '2rem' }}>
               {displayProducts.slice(0, 12).map(product => (
                 <div style={{ position: 'relative' }} key={`new-${product.id}`}>
                   <div className="new-badge" style={{ zIndex: 10 }}>NEW</div>
@@ -285,7 +285,7 @@ const Home = ({ searchQuery }) => {
               </p>
             </div>
 
-            <div className="collections-grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '2rem' }}>
+            <div className="collections-grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))', gap: '2rem' }}>
               {bestSellers.map(product => (
                 <ProductCard key={`best-${product.id}`} product={product} />
               ))}
@@ -301,7 +301,7 @@ const Home = ({ searchQuery }) => {
               </p>
             </div>
 
-            <div className="collections-grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '2rem' }}>
+            <div className="collections-grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))', gap: '2rem' }}>
               {displayProducts.map(product => (
                 <ProductCard key={`all-${product.id}`} product={product} />
               ))}

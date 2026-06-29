@@ -71,7 +71,9 @@ const Checkout = () => {
           },
           body: JSON.stringify({
             payment_method: paymentMethod,
-            shipping_address: `${shippingDetails.address}, ${shippingDetails.city} - ${shippingDetails.pincode}`
+            shipping_address: `${shippingDetails.fullName}, ${shippingDetails.address}, ${shippingDetails.city} - ${shippingDetails.pincode}`,
+            shipping_phone: shippingDetails.phone,
+            shipping_pincode: shippingDetails.pincode
           })
         });
         const data = await res.json();

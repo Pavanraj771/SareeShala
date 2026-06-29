@@ -109,6 +109,9 @@ const Navbar = ({ searchQuery, setSearchQuery }) => {
       </div>
       
       <div className={`nav-links ${mobileMenuOpen ? 'mobile-open' : ''}`}>
+        <button className="mobile-menu-close" onClick={() => setMobileMenuOpen(false)} aria-label="Close menu">
+          <X size={24} />
+        </button>
         <a href="#new" className="nav-item" onClick={(e) => handleNavClick(e, '#new')}>New Arrivals</a>
         <a href="#bestsellers" className="nav-item" onClick={(e) => handleNavClick(e, '#bestsellers')}>Best Sellers</a>
         <span className="nav-item" onClick={() => { setMobileMenuOpen(false); navigate('/notifications'); }} style={{cursor: 'pointer', position: 'relative'}}>

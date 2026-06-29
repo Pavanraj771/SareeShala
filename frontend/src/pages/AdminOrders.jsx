@@ -274,6 +274,27 @@ const AdminOrders = ({ reopenOrderId }) => {
             <div style={{ marginBottom: '1.5rem' }}>
               <h4 style={{ color: 'var(--color-accent-primary)', marginBottom: '10px' }}>Customer Info</h4>
               <p style={{ margin: '5px 0', color: 'var(--color-text-primary)' }}><strong>User:</strong> {orderModal.order.user}</p>
+              {orderModal.order.shipping_phone && (
+                <p style={{ margin: '5px 0', color: 'var(--color-text-primary)' }}><strong>Phone:</strong> {orderModal.order.shipping_phone}</p>
+              )}
+            </div>
+
+            <div style={{ marginBottom: '1.5rem' }}>
+              <h4 style={{ color: 'var(--color-accent-primary)', marginBottom: '10px' }}>Shipping Address</h4>
+              {orderModal.order.shipping_address ? (
+                <div style={{ background: 'var(--color-bg-primary)', borderRadius: '8px', border: '1px solid var(--border-subtle)', padding: '1rem' }}>
+                  <p style={{ margin: '0 0 6px 0', color: 'var(--color-text-primary)', lineHeight: '1.6' }}>
+                    {orderModal.order.shipping_address}
+                  </p>
+                  {orderModal.order.shipping_pincode && (
+                    <p style={{ margin: '0', color: 'var(--color-text-secondary)', fontSize: '0.9rem' }}>
+                      <strong>PIN Code:</strong> {orderModal.order.shipping_pincode}
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <p style={{ margin: 0, color: 'var(--color-text-secondary)', fontStyle: 'italic' }}>No shipping address provided (older order)</p>
+              )}
             </div>
 
             <div style={{ marginBottom: '1.5rem' }}>

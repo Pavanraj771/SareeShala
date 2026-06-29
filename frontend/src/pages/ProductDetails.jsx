@@ -257,7 +257,7 @@ const ProductDetails = () => {
           </div>
           
           {!isAdmin && (
-            <div className="product-actions" style={{ display: 'flex', gap: '15px', marginTop: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
+            <div className="product-actions">
               <button 
                 className={`details-like-btn ${isLiked ? 'liked' : ''}`}
                 onClick={toggleWishlist}
@@ -269,7 +269,6 @@ const ProductDetails = () => {
               <button 
                 className="btn-primary add-to-cart-btn" 
                 disabled={product.stock <= 0} 
-                style={{ margin: 0, flex: 2 }}
                 onClick={addToCart}
               >
                 <ShoppingBag size={20} /> Add to Cart
@@ -277,21 +276,6 @@ const ProductDetails = () => {
 
               <button 
                 className="btn-secondary reviews-btn" 
-                style={{ 
-                  margin: 0, 
-                  flex: 1, 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  gap: '8px',
-                  padding: '12px 20px',
-                  borderRadius: 'var(--border-radius-md)',
-                  background: 'rgba(255,255,255,0.05)',
-                  border: '1px solid rgba(255,255,255,0.1)',
-                  color: 'var(--color-text-primary)',
-                  cursor: 'pointer',
-                  fontWeight: '500',
-                  transition: 'all 0.3s ease'
-                }}
                 onClick={fetchReviews}
                 disabled={reviewsLoading}
               >

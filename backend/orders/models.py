@@ -14,6 +14,9 @@ class Order(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PENDING')
     admin_cancellation_reason = models.TextField(blank=True, null=True)
     total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    shipping_address = models.TextField(blank=True, null=True)
+    shipping_phone = models.CharField(max_length=20, blank=True, null=True)
+    shipping_pincode = models.CharField(max_length=10, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
