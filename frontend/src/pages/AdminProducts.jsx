@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Edit2, Trash2, Plus, X } from 'lucide-react';
+import { Edit2, Trash2, Plus, X, Eye } from 'lucide-react';
 import { API_URL } from '../config';
 
 const AdminProducts = () => {
@@ -135,6 +135,17 @@ const AdminProducts = () => {
 
   return (
     <div className="admin-content animate-fade-in" style={{ background: 'var(--color-bg-primary)', padding: '1.5rem', borderRadius: 'var(--border-radius-lg)', border: '1px solid var(--border-subtle)' }}>
+      <style>
+        {`
+          @media (max-width: 768px) {
+            .desktop-only-col { display: none !important; }
+            .mobile-only-btn { display: flex !important; }
+          }
+          @media (min-width: 769px) {
+            .mobile-only-btn { display: none !important; }
+          }
+        `}
+      </style>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
         <h2 style={{ color: 'var(--color-accent-primary)', margin: 0, fontFamily: 'var(--font-serif)' }}>Product Management</h2>
         <button onClick={openAddModal} className="btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '5px', margin: 0, padding: '8px 16px', fontSize: '0.9rem' }}>
@@ -149,7 +160,7 @@ const AdminProducts = () => {
               <th style={{ padding: '12px', color: 'var(--color-text-secondary)' }}>Image</th>
               <th style={{ padding: '12px', color: 'var(--color-text-secondary)' }}>Name</th>
               <th style={{ padding: '12px', color: 'var(--color-text-secondary)' }}>Price</th>
-              <th style={{ padding: '12px', color: 'var(--color-text-secondary)' }}>Stock</th>
+              <th className="desktop-only-col" style={{ padding: '12px', color: 'var(--color-text-secondary)' }}>Stock</th>
               <th style={{ padding: '12px', color: 'var(--color-text-secondary)' }}>Actions</th>
             </tr>
           </thead>
@@ -166,7 +177,7 @@ const AdminProducts = () => {
                 </td>
                 <td style={{ padding: '12px', fontWeight: 'bold' }}>{p.name}</td>
                 <td style={{ padding: '12px' }}>₹{p.price}</td>
-                <td style={{ padding: '12px' }}>{p.stock}</td>
+                <td className="desktop-only-col" style={{ padding: '12px' }}>{p.stock}</td>
                 <td style={{ padding: '12px' }} onClick={(e) => e.stopPropagation()}>
                   <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                     <button 
@@ -185,6 +196,23 @@ const AdminProducts = () => {
                       }}
                     >
                       <Edit2 size={14} /> Edit
+                    </button>
+                    <button 
+                      className="mobile-only-btn"
+                      onClick={() => navigate(`/product/${p.id}`, { state: { adminTab: 'products' } })} 
+                      style={{ 
+                        background: 'rgba(46, 204, 113, 0.1)', 
+                        color: '#2ecc71', 
+                        border: '1px solid transparent', 
+                        padding: '6px 12px', 
+                        borderRadius: '6px', 
+                        cursor: 'pointer',
+                        alignItems: 'center',
+                        gap: '4px',
+                        fontSize: '0.85rem'
+                      }}
+                    >
+                      <Eye size={14} /> Details
                     </button>
                     <button 
                       onClick={() => handleDelete(p.id)} 
@@ -218,7 +246,7 @@ const AdminProducts = () => {
 
       {showModal && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' }}>
-          <div style={{ background: 'var(--color-bg-secondary)', padding: '2rem', borderRadius: 'var(--border-radius-lg)', width: '100%', maxWidth: '600px', maxHeight: '90vh', overflowY: 'auto', border: '1px solid var(--border-subtle)', boxShadow: '0 10px 30px rgba(0,0,0,0.5)' }}>
+          <div style={{ background: 'var(--color-bg-secondary)', padding: 'clamp(1rem, 4vw, 2rem)', borderRadius: 'var(--border-radius-lg)', width: '95%', maxWidth: '600px', maxHeight: '90vh', overflowY: 'auto', overflowX: 'hidden', border: '1px solid var(--border-subtle)', boxShadow: '0 10px 30px rgba(0,0,0,0.5)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
               <h3 style={{ margin: 0, color: 'var(--color-text-primary)' }}>{editId ? 'Edit Product' : 'Add New Product'}</h3>
               <button onClick={() => setShowModal(false)} style={{ background: 'none', border: 'none', color: 'var(--color-text-secondary)', cursor: 'pointer' }}><X size={20} /></button>

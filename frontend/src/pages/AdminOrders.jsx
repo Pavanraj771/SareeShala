@@ -64,6 +64,12 @@ const AdminOrders = ({ reopenOrderId }) => {
       if (res.ok) {
         fetchOrders();
         setCancelModal({ open: false, orderId: null, reason: '' });
+        setOrderModal(prev => {
+          if (prev.open && prev.order && prev.order.id === orderId) {
+            return { ...prev, order: { ...prev.order, status: newStatus, admin_cancellation_reason: reason } };
+          }
+          return prev;
+        });
       }
     } catch (err) {
       console.error(err);
@@ -225,7 +231,7 @@ const AdminOrders = ({ reopenOrderId }) => {
       </div>
 
       {cancelModal.open && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1100 }}>
           <div style={{ background: 'var(--color-bg-secondary)', padding: '2rem', borderRadius: 'var(--border-radius-lg)', border: '1px solid var(--border-subtle)', maxWidth: '400px', width: '90%' }}>
             <h3 style={{ margin: '0 0 1rem 0', color: 'var(--color-text-primary)' }}>Cancel Order #{cancelModal.orderId}</h3>
             <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.9rem', marginBottom: '1rem' }}>Please provide a reason for cancelling this order. This will be sent to the user.</p>
@@ -255,8 +261,8 @@ const AdminOrders = ({ reopenOrderId }) => {
 
       {orderModal.open && orderModal.order && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' }}>
-          <div style={{ background: 'var(--color-bg-secondary)', padding: '2rem', borderRadius: 'var(--border-radius-lg)', border: '1px solid var(--border-subtle)', maxWidth: '600px', width: '100%', maxHeight: '85vh', overflowY: 'auto' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '1rem' }}>
+          <div style={{ background: 'var(--color-bg-secondary)', padding: 'clamp(1rem, 4vw, 2rem)', borderRadius: 'var(--border-radius-lg)', border: '1px solid var(--border-subtle)', maxWidth: '600px', width: '95%', maxHeight: '85vh', overflowY: 'auto', overflowX: 'hidden' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '1rem', gap: '10px' }}>
               <div>
                 <h3 style={{ margin: '0 0 5px 0', color: 'var(--color-text-primary)' }}>Order #{orderModal.order.id} Details</h3>
                 <p style={{ margin: 0, color: 'var(--color-text-secondary)', fontSize: '0.9rem' }}>
@@ -299,7 +305,7 @@ const AdminOrders = ({ reopenOrderId }) => {
 
             <div style={{ marginBottom: '1.5rem' }}>
               <h4 style={{ color: 'var(--color-accent-primary)', marginBottom: '10px' }}>Order Items</h4>
-              <div style={{ background: 'var(--color-bg-primary)', borderRadius: '8px', border: '1px solid var(--border-subtle)', overflow: 'hidden' }}>
+              <div style={{ background: 'var(--color-bg-primary)', borderRadius: '8px', border: '1px solid var(--border-subtle)', overflowX: 'auto' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
                   <thead>
                     <tr style={{ background: 'rgba(255,255,255,0.02)', borderBottom: '1px solid var(--border-subtle)' }}>
@@ -341,7 +347,7 @@ const AdminOrders = ({ reopenOrderId }) => {
               </div>
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '2rem', paddingTop: '1rem', borderTop: '1px solid var(--border-subtle)' }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', justifyContent: 'space-between', alignItems: 'center', marginTop: '2rem', paddingTop: '1rem', borderTop: '1px solid var(--border-subtle)' }}>
               <div>
                 <h4 style={{ margin: 0, color: 'var(--color-text-secondary)', fontSize: '0.9rem' }}>Status</h4>
                 <span className="status-badge" style={{ background: `${getStatusColor(orderModal.order.status)}22`, color: getStatusColor(orderModal.order.status), border: `1px solid ${getStatusColor(orderModal.order.status)}`, display: 'inline-block', marginTop: '5px' }}>
@@ -361,10 +367,18 @@ const AdminOrders = ({ reopenOrderId }) => {
               </div>
             </div>
             
-            <div style={{ marginTop: '2rem', textAlign: 'right' }}>
+            <div style={{ marginTop: '2rem', display: 'flex', flexWrap: 'wrap', gap: '15px', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border-subtle)', paddingTop: '1.5rem' }}>
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                <span style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', display: 'flex', alignItems: 'center', marginRight: '5px' }}>Change Status:</span>
+                {orderModal.order.status !== 'PROCESSING' && <button onClick={() => updateStatus(orderModal.order.id, 'PROCESSING')} style={{ padding: '6px 12px', background: 'rgba(52, 152, 219, 0.1)', color: '#3498db', border: '1px solid transparent', borderRadius: '6px', cursor: 'pointer', fontSize: '0.85rem' }}>Processing</button>}
+                {orderModal.order.status !== 'SHIPPED' && <button onClick={() => updateStatus(orderModal.order.id, 'SHIPPED')} style={{ padding: '6px 12px', background: 'rgba(212, 175, 55, 0.1)', color: '#d4af37', border: '1px solid transparent', borderRadius: '6px', cursor: 'pointer', fontSize: '0.85rem' }}>Shipped</button>}
+                {orderModal.order.status !== 'DELIVERED' && <button onClick={() => updateStatus(orderModal.order.id, 'DELIVERED')} style={{ padding: '6px 12px', background: 'rgba(76, 175, 80, 0.1)', color: '#4caf50', border: '1px solid transparent', borderRadius: '6px', cursor: 'pointer', fontSize: '0.85rem' }}>Delivered</button>}
+                {orderModal.order.status !== 'CANCELLED' && <button onClick={() => updateStatus(orderModal.order.id, 'CANCELLED')} style={{ padding: '6px 12px', background: 'rgba(255, 77, 77, 0.1)', color: '#ff4d4d', border: '1px solid transparent', borderRadius: '6px', cursor: 'pointer', fontSize: '0.85rem' }}>Cancel</button>}
+              </div>
               <button 
                 className="btn-primary"
                 onClick={() => setOrderModal({ open: false, order: null })}
+                style={{ padding: '8px 16px', fontSize: '0.9rem' }}
               >
                 Close Details
               </button>

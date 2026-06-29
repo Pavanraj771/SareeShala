@@ -57,6 +57,12 @@ const AdminUsers = () => {
       
       // Update local state
       setUsers(users.map(u => u.id === userId ? { ...u, is_active: data.is_active } : u));
+      setUserDetails(prev => {
+        if (prev && prev.profile && prev.profile.id === userId) {
+          return { ...prev, profile: { ...prev.profile, is_active: data.is_active } };
+        }
+        return prev;
+      });
       showMessage(data.message || 'User status updated');
     } catch (err) {
       showMessage(err.message);
@@ -108,6 +114,9 @@ const AdminUsers = () => {
       
       // Remove from local state
       setUsers(users.filter(u => u.id !== userId));
+      if (viewUserDetailsId === userId) {
+        setViewUserDetailsId(null);
+      }
       showMessage('User deleted successfully.');
     } catch (err) {
       showMessage(err.message);
@@ -124,6 +133,17 @@ const AdminUsers = () => {
 
   return (
     <div className="admin-content animate-fade-in" style={{ background: 'var(--color-bg-primary)', padding: '2rem', borderRadius: 'var(--border-radius-lg)', color: 'var(--color-text-primary)', border: '1px solid var(--border-subtle)' }}>
+      <style>
+        {`
+          @media (max-width: 768px) {
+            .desktop-only-col { display: none !important; }
+            .mobile-only-btn { display: flex !important; }
+          }
+          @media (min-width: 769px) {
+            .mobile-only-btn { display: none !important; }
+          }
+        `}
+      </style>
       <h2 style={{ color: 'var(--color-accent-primary)', marginBottom: '1.5rem', fontFamily: 'var(--font-serif)' }}>User Management</h2>
       
       {isDemoAdmin && (
@@ -136,24 +156,24 @@ const AdminUsers = () => {
         <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
           <thead>
             <tr style={{ borderBottom: '1px solid var(--border-subtle)' }}>
-              <th style={{ padding: '1rem', color: 'var(--color-text-secondary)', fontWeight: 'normal' }}>ID</th>
+              <th className="desktop-only-col" style={{ padding: '1rem', color: 'var(--color-text-secondary)', fontWeight: 'normal' }}>ID</th>
               <th style={{ padding: '1rem', color: 'var(--color-text-secondary)', fontWeight: 'normal' }}>Username</th>
-              <th style={{ padding: '1rem', color: 'var(--color-text-secondary)', fontWeight: 'normal' }}>Email</th>
-              <th style={{ padding: '1rem', color: 'var(--color-text-secondary)', fontWeight: 'normal' }}>Status</th>
-              <th style={{ padding: '1rem', color: 'var(--color-text-secondary)', fontWeight: 'normal' }}>Joined</th>
+              <th className="desktop-only-col" style={{ padding: '1rem', color: 'var(--color-text-secondary)', fontWeight: 'normal' }}>Email</th>
+              <th className="desktop-only-col" style={{ padding: '1rem', color: 'var(--color-text-secondary)', fontWeight: 'normal' }}>Status</th>
+              <th className="desktop-only-col" style={{ padding: '1rem', color: 'var(--color-text-secondary)', fontWeight: 'normal' }}>Joined</th>
               <th style={{ padding: '1rem', color: 'var(--color-text-secondary)', fontWeight: 'normal' }}>Actions</th>
             </tr>
           </thead>
           <tbody>
             {users.map(u => (
               <tr key={u.id} style={{ borderBottom: '1px solid var(--border-subtle)' }}>
-                <td style={{ padding: '1rem', color: 'var(--color-text-primary)' }}>{u.id}</td>
+                <td className="desktop-only-col" style={{ padding: '1rem', color: 'var(--color-text-primary)' }}>{u.id}</td>
                 <td style={{ padding: '1rem', color: 'var(--color-text-primary)' }}>
                   <span style={{ fontWeight: 'bold' }}>{u.username}</span>
                   {u.is_staff && <span style={{ marginLeft: '8px', fontSize: '0.7rem', background: 'var(--color-accent-primary)', color: '#000', padding: '2px 6px', borderRadius: '4px' }}>Admin</span>}
                 </td>
-                <td style={{ padding: '1rem', color: 'var(--color-text-secondary)' }}>{u.email}</td>
-                <td style={{ padding: '1rem' }}>
+                <td className="desktop-only-col" style={{ padding: '1rem', color: 'var(--color-text-secondary)' }}>{u.email}</td>
+                <td className="desktop-only-col" style={{ padding: '1rem' }}>
                   {u.is_deleted_by_user ? (
                     <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: '#e91e63', background: 'rgba(233, 30, 99, 0.1)', padding: '4px 8px', borderRadius: '12px', fontSize: '0.85rem', fontWeight: '500' }} title="This account was deleted by user">
                       <XCircle size={14} /> Deleted by User
@@ -168,7 +188,7 @@ const AdminUsers = () => {
                     </span>
                   )}
                 </td>
-                <td style={{ padding: '1rem', color: 'var(--color-text-secondary)', fontSize: '0.9rem' }}>{u.date_joined.split(' ')[0]}</td>
+                <td className="desktop-only-col" style={{ padding: '1rem', color: 'var(--color-text-secondary)', fontSize: '0.9rem' }}>{u.date_joined.split(' ')[0]}</td>
                 <td style={{ padding: '1rem' }}>
                   <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                     <button 
@@ -189,6 +209,7 @@ const AdminUsers = () => {
                       <Eye size={14} /> Details
                     </button>
                     <button 
+                      className="desktop-only-col"
                       onClick={() => handleToggleBlock(u.id)}
                       disabled={u.is_staff}
                       style={{ 
@@ -208,6 +229,7 @@ const AdminUsers = () => {
                       <ShieldAlert size={14} /> {u.is_active ? 'Block' : 'Unblock'}
                     </button>
                     <button 
+                      className="desktop-only-col"
                       onClick={() => confirmDelete(u.id)}
                       disabled={u.is_staff}
                       style={{ 
@@ -249,7 +271,7 @@ const AdminUsers = () => {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          zIndex: 1000
+          zIndex: 1100
         }}>
           <div style={{
             background: 'var(--color-bg-primary)',
@@ -310,13 +332,14 @@ const AdminUsers = () => {
         }}>
           <div style={{
             background: 'var(--color-bg-primary)',
-            padding: '2rem',
+            padding: 'clamp(1rem, 4vw, 2rem)',
             borderRadius: 'var(--border-radius-lg)',
             border: '1px solid var(--border-subtle)',
             maxWidth: '800px',
-            width: '90%',
+            width: '95%',
             maxHeight: '90vh',
             overflowY: 'auto',
+            overflowX: 'hidden',
             position: 'relative',
             boxShadow: '0 20px 40px rgba(0,0,0,0.2)'
           }}>
@@ -343,7 +366,7 @@ const AdminUsers = () => {
               <div style={{ color: 'var(--color-text-primary)', textAlign: 'center', padding: '2rem' }}>Loading user details...</div>
             ) : userDetails ? (
               <div style={{ color: 'var(--color-text-secondary)', fontSize: '0.95rem' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 250px), 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
                   <div>
                     <p style={{ margin: '5px 0' }}><strong style={{ color: 'var(--color-text-primary)'}}>Username:</strong> {userDetails.profile.username}</p>
                     <p style={{ margin: '5px 0' }}><strong style={{ color: 'var(--color-text-primary)'}}>Name:</strong> {userDetails.profile.first_name} {userDetails.profile.last_name}</p>
@@ -364,7 +387,7 @@ const AdminUsers = () => {
                 {activeDetailTab === 'summary' && (
                   <>
                     <h4 style={{ color: 'var(--color-text-primary)', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '5px', marginBottom: '10px' }}>Activity Summary</h4>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem', marginBottom: '1.5rem', textAlign: 'center' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 120px), 1fr))', gap: '1rem', marginBottom: '1.5rem', textAlign: 'center' }}>
                       <div onClick={() => setActiveDetailTab('orders')} style={{ background: 'var(--color-bg-secondary)', border: '1px solid var(--border-subtle)', padding: '10px', borderRadius: '8px', cursor: 'pointer', transition: 'background 0.2s' }} onMouseOver={e => e.currentTarget.style.background='var(--border-subtle)'} onMouseOut={e => e.currentTarget.style.background='var(--color-bg-secondary)'}>
                         <div style={{ fontSize: '1.2rem', color: 'var(--color-accent-primary)', fontWeight: 'bold' }}>{userDetails.stats.total_orders}</div>
                         <div style={{ fontSize: '0.8rem' }}>Orders</div>
@@ -386,26 +409,28 @@ const AdminUsers = () => {
                     {userDetails.recent_orders?.length > 0 && (
                       <>
                         <h4 style={{ color: 'var(--color-text-primary)', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '5px', marginBottom: '10px' }}>Recent Orders</h4>
-                        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
-                          <thead>
-                            <tr style={{ borderBottom: '1px solid var(--border-subtle)' }}>
-                              <th style={{ padding: '8px', textAlign: 'left', color: 'var(--color-text-secondary)' }}>Order ID</th>
-                              <th style={{ padding: '8px', textAlign: 'left', color: 'var(--color-text-secondary)' }}>Date</th>
-                              <th style={{ padding: '8px', textAlign: 'left', color: 'var(--color-text-secondary)' }}>Status</th>
-                              <th style={{ padding: '8px', textAlign: 'left', color: 'var(--color-text-secondary)' }}>Total</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {userDetails.recent_orders.map(order => (
-                              <tr key={order.id} style={{ borderBottom: '1px solid var(--border-subtle)' }}>
-                                <td style={{ padding: '8px', color: 'var(--color-text-primary)' }}>#{order.id}</td>
-                                <td style={{ padding: '8px' }}>{order.created_at}</td>
-                                <td style={{ padding: '8px' }}>{order.status}</td>
-                                <td style={{ padding: '8px', color: 'var(--color-text-primary)' }}>₹{order.total_amount}</td>
+                        <div style={{ overflowX: 'auto', borderRadius: '8px', border: '1px solid var(--border-subtle)' }}>
+                          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem', minWidth: '400px' }}>
+                            <thead>
+                              <tr style={{ borderBottom: '1px solid var(--border-subtle)', background: 'rgba(255,255,255,0.02)' }}>
+                                <th style={{ padding: '10px 12px', textAlign: 'left', color: 'var(--color-text-secondary)' }}>Order ID</th>
+                                <th style={{ padding: '10px 12px', textAlign: 'left', color: 'var(--color-text-secondary)' }}>Date</th>
+                                <th style={{ padding: '10px 12px', textAlign: 'left', color: 'var(--color-text-secondary)' }}>Status</th>
+                                <th style={{ padding: '10px 12px', textAlign: 'left', color: 'var(--color-text-secondary)' }}>Total</th>
                               </tr>
-                            ))}
-                          </tbody>
-                        </table>
+                            </thead>
+                            <tbody>
+                              {userDetails.recent_orders.map(order => (
+                                <tr key={order.id} style={{ borderBottom: '1px solid var(--border-subtle)' }}>
+                                  <td style={{ padding: '10px 12px', color: 'var(--color-text-primary)' }}>#{order.id}</td>
+                                  <td style={{ padding: '10px 12px' }}>{order.created_at}</td>
+                                  <td style={{ padding: '10px 12px' }}>{order.status}</td>
+                                  <td style={{ padding: '10px 12px', color: 'var(--color-text-primary)' }}>₹{order.total_amount}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
                       </>
                     )}
                   </>
@@ -470,40 +495,42 @@ const AdminUsers = () => {
                       <>
                         <h4 style={{ color: 'var(--color-text-primary)', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '5px', marginBottom: '10px' }}>Cart Items</h4>
                         {userDetails.cart_items?.length > 0 ? (
-                          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
-                            <thead>
-                              <tr style={{ borderBottom: '1px solid var(--border-subtle)' }}>
-                                <th style={{ padding: '12px 8px', textAlign: 'left', color: 'var(--color-text-secondary)' }}>Product Image</th>
-                                <th style={{ padding: '12px 8px', textAlign: 'left', color: 'var(--color-text-secondary)' }}>Product Name</th>
-                                <th style={{ padding: '12px 8px', textAlign: 'left', color: 'var(--color-text-secondary)' }}>Price</th>
-                                <th style={{ padding: '12px 8px', textAlign: 'left', color: 'var(--color-text-secondary)' }}>Qty</th>
-                                <th style={{ padding: '12px 8px', textAlign: 'left', color: 'var(--color-text-secondary)' }}>Added On</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {userDetails.cart_items.map(item => (
-                                <tr 
-                                  key={item.id} 
-                                  onClick={() => navigate(`/product/${item.product_id}`)}
-                                  style={{ borderBottom: '1px solid var(--border-subtle)', cursor: 'pointer', transition: 'background 0.2s' }}
-                                  onMouseOver={e => e.currentTarget.style.background='var(--border-subtle)'} 
-                                  onMouseOut={e => e.currentTarget.style.background='transparent'}
-                                >
-                                  <td style={{ padding: '8px' }}>
-                                    {item.image ? (
-                                        <img src={item.image} alt={item.product_name} style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '4px' }} />
-                                      ) : (
-                                        <div style={{ width: '50px', height: '50px', background: 'var(--border-subtle)', borderRadius: '4px' }}></div>
-                                      )}
-                                  </td>
-                                  <td style={{ padding: '8px', color: '#2196f3', fontWeight: 'bold' }}>{item.product_name}</td>
-                                  <td style={{ padding: '8px', color: 'var(--color-text-primary)' }}>₹{item.price}</td>
-                                  <td style={{ padding: '8px', color: 'var(--color-text-primary)' }}>{item.quantity}</td>
-                                  <td style={{ padding: '8px', color: 'var(--color-text-secondary)' }}>{item.added_at}</td>
+                          <div style={{ overflowX: 'auto', borderRadius: '8px', border: '1px solid var(--border-subtle)' }}>
+                            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem', minWidth: '500px' }}>
+                              <thead>
+                                <tr style={{ borderBottom: '1px solid var(--border-subtle)', background: 'rgba(255,255,255,0.02)' }}>
+                                  <th style={{ padding: '12px 10px', textAlign: 'left', color: 'var(--color-text-secondary)' }}>Image</th>
+                                  <th style={{ padding: '12px 10px', textAlign: 'left', color: 'var(--color-text-secondary)' }}>Product Name</th>
+                                  <th style={{ padding: '12px 10px', textAlign: 'left', color: 'var(--color-text-secondary)' }}>Price</th>
+                                  <th style={{ padding: '12px 10px', textAlign: 'left', color: 'var(--color-text-secondary)' }}>Qty</th>
+                                  <th style={{ padding: '12px 10px', textAlign: 'left', color: 'var(--color-text-secondary)' }}>Added On</th>
                                 </tr>
-                              ))}
-                            </tbody>
-                          </table>
+                              </thead>
+                              <tbody>
+                                {userDetails.cart_items.map(item => (
+                                  <tr 
+                                    key={item.id} 
+                                    onClick={() => navigate(`/product/${item.product_id}`)}
+                                    style={{ borderBottom: '1px solid var(--border-subtle)', cursor: 'pointer', transition: 'background 0.2s' }}
+                                    onMouseOver={e => e.currentTarget.style.background='var(--border-subtle)'} 
+                                    onMouseOut={e => e.currentTarget.style.background='transparent'}
+                                  >
+                                    <td style={{ padding: '10px' }}>
+                                      {item.image ? (
+                                          <img src={item.image} alt={item.product_name} style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '4px' }} />
+                                        ) : (
+                                          <div style={{ width: '50px', height: '50px', background: 'var(--border-subtle)', borderRadius: '4px' }}></div>
+                                        )}
+                                    </td>
+                                    <td style={{ padding: '10px', color: '#2196f3', fontWeight: 'bold' }}>{item.product_name}</td>
+                                    <td style={{ padding: '10px', color: 'var(--color-text-primary)' }}>₹{item.price}</td>
+                                    <td style={{ padding: '10px', color: 'var(--color-text-primary)' }}>{item.quantity}</td>
+                                    <td style={{ padding: '10px', color: 'var(--color-text-secondary)' }}>{item.added_at}</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
                         ) : <p>Cart is empty.</p>}
                       </>
                     )}
@@ -512,43 +539,96 @@ const AdminUsers = () => {
                       <>
                         <h4 style={{ color: 'var(--color-text-primary)', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '5px', marginBottom: '10px' }}>Wishlist Items</h4>
                         {userDetails.wishlist_items?.length > 0 ? (
-                          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
-                            <thead>
-                              <tr style={{ borderBottom: '1px solid var(--border-subtle)' }}>
-                                <th style={{ padding: '12px 8px', textAlign: 'left', color: 'var(--color-text-secondary)' }}>Product Image</th>
-                                <th style={{ padding: '12px 8px', textAlign: 'left', color: 'var(--color-text-secondary)' }}>Product Name</th>
-                                <th style={{ padding: '12px 8px', textAlign: 'left', color: 'var(--color-text-secondary)' }}>Price</th>
-                                <th style={{ padding: '12px 8px', textAlign: 'left', color: 'var(--color-text-secondary)' }}>Added On</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {userDetails.wishlist_items.map(item => (
-                                <tr 
-                                  key={item.id} 
-                                  onClick={() => navigate(`/product/${item.product_id}`)}
-                                  style={{ borderBottom: '1px solid var(--border-subtle)', cursor: 'pointer', transition: 'background 0.2s' }}
-                                  onMouseOver={e => e.currentTarget.style.background='var(--border-subtle)'} 
-                                  onMouseOut={e => e.currentTarget.style.background='transparent'}
-                                >
-                                  <td style={{ padding: '8px' }}>
-                                    {item.image ? (
-                                        <img src={item.image} alt={item.product_name} style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '4px' }} />
-                                      ) : (
-                                        <div style={{ width: '50px', height: '50px', background: 'var(--border-subtle)', borderRadius: '4px' }}></div>
-                                      )}
-                                  </td>
-                                  <td style={{ padding: '8px', color: '#2196f3', fontWeight: 'bold' }}>{item.product_name}</td>
-                                  <td style={{ padding: '8px', color: 'var(--color-text-primary)' }}>₹{item.price}</td>
-                                  <td style={{ padding: '8px', color: 'var(--color-text-secondary)' }}>{item.added_at}</td>
+                          <div style={{ overflowX: 'auto', borderRadius: '8px', border: '1px solid var(--border-subtle)' }}>
+                            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem', minWidth: '450px' }}>
+                              <thead>
+                                <tr style={{ borderBottom: '1px solid var(--border-subtle)', background: 'rgba(255,255,255,0.02)' }}>
+                                  <th style={{ padding: '12px 10px', textAlign: 'left', color: 'var(--color-text-secondary)' }}>Image</th>
+                                  <th style={{ padding: '12px 10px', textAlign: 'left', color: 'var(--color-text-secondary)' }}>Product Name</th>
+                                  <th style={{ padding: '12px 10px', textAlign: 'left', color: 'var(--color-text-secondary)' }}>Price</th>
+                                  <th style={{ padding: '12px 10px', textAlign: 'left', color: 'var(--color-text-secondary)' }}>Added On</th>
                                 </tr>
-                              ))}
-                            </tbody>
-                          </table>
+                              </thead>
+                              <tbody>
+                                {userDetails.wishlist_items.map(item => (
+                                  <tr 
+                                    key={item.id} 
+                                    onClick={() => navigate(`/product/${item.product_id}`)}
+                                    style={{ borderBottom: '1px solid var(--border-subtle)', cursor: 'pointer', transition: 'background 0.2s' }}
+                                    onMouseOver={e => e.currentTarget.style.background='var(--border-subtle)'} 
+                                    onMouseOut={e => e.currentTarget.style.background='transparent'}
+                                  >
+                                    <td style={{ padding: '10px' }}>
+                                      {item.image ? (
+                                          <img src={item.image} alt={item.product_name} style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '4px' }} />
+                                        ) : (
+                                          <div style={{ width: '50px', height: '50px', background: 'var(--border-subtle)', borderRadius: '4px' }}></div>
+                                        )}
+                                    </td>
+                                    <td style={{ padding: '10px', color: '#2196f3', fontWeight: 'bold' }}>{item.product_name}</td>
+                                    <td style={{ padding: '10px', color: 'var(--color-text-primary)' }}>₹{item.price}</td>
+                                    <td style={{ padding: '10px', color: 'var(--color-text-secondary)' }}>{item.added_at}</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
                         ) : <p>Wishlist is empty.</p>}
                       </>
                     )}
                   </div>
                 )}
+                
+                <div style={{ marginTop: '2rem', display: 'flex', flexWrap: 'wrap', gap: '15px', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border-subtle)', paddingTop: '1.5rem' }}>
+                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                    <span style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', display: 'flex', alignItems: 'center', marginRight: '5px' }}>Actions:</span>
+                    <button 
+                      onClick={() => handleToggleBlock(userDetails.profile.id)}
+                      disabled={userDetails.profile.is_staff}
+                      style={{ 
+                        background: userDetails.profile.is_active ? 'rgba(255, 152, 0, 0.1)' : 'rgba(76, 175, 80, 0.1)', 
+                        color: userDetails.profile.is_active ? '#ff9800' : '#4caf50', 
+                        border: '1px solid transparent', 
+                        padding: '6px 12px', 
+                        borderRadius: '6px', 
+                        cursor: userDetails.profile.is_staff ? 'not-allowed' : 'pointer',
+                        opacity: userDetails.profile.is_staff ? 0.5 : 1,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        fontSize: '0.85rem'
+                      }}
+                    >
+                      <ShieldAlert size={14} /> {userDetails.profile.is_active ? 'Block' : 'Unblock'}
+                    </button>
+                    <button 
+                      onClick={() => confirmDelete(userDetails.profile.id)}
+                      disabled={userDetails.profile.is_staff}
+                      style={{ 
+                        background: 'rgba(244, 67, 54, 0.1)', 
+                        color: '#f44336', 
+                        border: '1px solid transparent', 
+                        padding: '6px 12px', 
+                        borderRadius: '6px', 
+                        cursor: userDetails.profile.is_staff ? 'not-allowed' : 'pointer',
+                        opacity: userDetails.profile.is_staff ? 0.5 : 1,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        fontSize: '0.85rem'
+                      }}
+                    >
+                      <Trash2 size={14} /> Delete
+                    </button>
+                  </div>
+                  <button 
+                    className="btn-primary"
+                    onClick={() => setViewUserDetailsId(null)}
+                    style={{ padding: '8px 16px', fontSize: '0.9rem' }}
+                  >
+                    Close Details
+                  </button>
+                </div>
               </div>
             ) : (
               <div style={{ color: '#ff4d4f', textAlign: 'center', padding: '2rem' }}>Failed to load user details.</div>
